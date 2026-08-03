@@ -1,11 +1,5 @@
-"""
-Configuración centralizada de la aplicación.
+# Configuración centralizada de la aplicación.
 
-Las credenciales de la base de datos NUNCA se hardcodean aquí: se leen
-desde variables de entorno (archivo .env en desarrollo). Esto evita subir
-contraseñas al repositorio y permite usar distintas credenciales en cada
-máquina del equipo sin tocar código.
-"""
 import os
 from dotenv import load_dotenv
 

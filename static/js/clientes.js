@@ -1,14 +1,3 @@
-/**
- * Vista Clientes: alta, edición y baja usando las rutas JSON del blueprint
- * routes/clientes.py (POST/PUT/DELETE /clientes/api...).
- *
- * Mismo patrón que static/js/productos.js: el listado y los formularios se
- * sirven como HTML normal desde Flask+Jinja; solo las escrituras pasan por
- * fetch() (vía apiRequest(), definido en main.js) para poder mostrar los
- * errores de la BD -incluido el SIGNAL del trigger tg_prevent_delete_cliente-
- * como alertas de Bootstrap sin recargar la página.
- */
-
 document.addEventListener("DOMContentLoaded", () => {
     initFormularioCliente();
     initBotonesEliminarCliente();
@@ -44,8 +33,7 @@ function initFormularioCliente() {
 
         submitBtn.classList.remove("is-loading");
 
-        // apiRequest ya mostró la alerta de error si algo falló. Si data
-        // existe, la operación tuvo éxito.
+        // apiRequest ya mostró la alerta de error si algo falló.
         if (data) {
             window.location.href = "/clientes/";
         }
@@ -69,9 +57,6 @@ function initBotonesEliminarCliente() {
                 const fila = document.getElementById(`cliente-${id}`);
                 if (fila) fila.remove();
             }
-            // Si el cliente tiene pedidos, el trigger tg_prevent_delete_cliente
-            // rechaza el DELETE y apiRequest ya mostró esa alerta con el
-            // mensaje exacto que definió el trigger (RB07).
         });
     });
 }

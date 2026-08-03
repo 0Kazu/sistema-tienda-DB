@@ -1,6 +1,3 @@
-/* Ajustes mínimos sobre Bootstrap. El proyecto usa el tema por defecto
-   a propósito: el foco de evaluación está en el backend y la BD. */
-
 body {
     background-color: #f5f6f8;
 }
@@ -13,7 +10,6 @@ body {
     font-weight: 600;
 }
 
-/* Utilidad para deshabilitar botones mientras una petición fetch() está en curso */
 .is-loading {
     pointer-events: none;
     opacity: 0.6;

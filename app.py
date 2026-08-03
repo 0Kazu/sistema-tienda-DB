@@ -1,12 +1,5 @@
-"""
-Punto de entrada de la aplicación.
+#Punto de entrada de la aplicación.
 
-En esta etapa solo existe la ruta de prueba ("/") que valida que la
-conexión a MariaDB funciona, consultando la vista vw_productos_bajo_stock.
-Las rutas de Productos, Clientes y Pedidos (CRUD) se agregarán como
-Blueprints dentro de routes/ en los siguientes pasos, y se registrarán
-aquí con app.register_blueprint(...).
-"""
 from flask import Flask, render_template, jsonify
 from flask import request, session, redirect, url_for, flash
 
@@ -33,17 +26,12 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(usuarios_bp, url_prefix='/usuarios')
 
-    # --- Manejo centralizado de errores SQL ---------------------------------
-    # Cualquier DatabaseError levantado en db.py (violación de FK/CHECK,
-    # o un SIGNAL SQLSTATE '45000' disparado por un trigger o por
-    # sp_pagar_pedido) llega aquí y se convierte en una respuesta JSON
-    # que el frontend puede mostrar como alerta, sin que cada ruta tenga
-    # que hacer su propio try/except.
+    # --- Manejo centralizado de errores SQL ---
     @app.before_request
     def proteger_rutas():
         rutas_publicas = ['auth.login', 'static']
         
-        # Si alguien intenta ir a una ruta privada y no tiene sesión, lo pateamos al login
+        # Si alguien intenta ir a una ruta privada se va pal login
         if request.endpoint not in rutas_publicas and 'id_usuario' not in session:
             flash("Acceso denegado. Por favor, inicia sesión.", "warning")
             return redirect(url_for('auth.login'))
@@ -56,19 +44,14 @@ def create_app():
     def handle_not_found(error):
         return jsonify(success=False, message="Recurso no encontrado."), 404
 
-    # --- Ruta de prueba -------------------------------------------------------
+    # --- Ruta de prueba ----
     @app.route("/")
     def index():
-        """
-        Verifica extremo a extremo: Flask -> PyMySQL -> MariaDB -> vista SQL.
-        Usa vw_productos_bajo_stock, pensada para el rol Bodeguero (RF17).
-        """
         productos_bajo_stock = db.run_query("SELECT * FROM vw_productos_bajo_stock")
         return render_template("index.html", productos=productos_bajo_stock)
 
     @app.route("/api/productos/bajo-stock")
     def api_productos_bajo_stock():
-        """Misma vista, en JSON, para probar la conexión desde JS (fetch)."""
         productos = db.run_query("SELECT * FROM vw_productos_bajo_stock")
         return jsonify(success=True, data=productos)
 

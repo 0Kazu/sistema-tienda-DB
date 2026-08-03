@@ -1,13 +1,3 @@
-/**
- * Vista Productos: alta, edición y baja usando las rutas JSON del blueprint
- * routes/productos.py (POST/PUT/DELETE /productos/api...).
- *
- * El listado y los formularios siempre se sirven como HTML normal desde
- * Flask+Jinja; solo las escrituras pasan por fetch() (vía apiRequest(),
- * definido en main.js) para poder mostrar los errores de la BD como
- * alertas de Bootstrap sin recargar la página.
- */
-
 document.addEventListener("DOMContentLoaded", () => {
     initFormularioProducto();
     initBotonesEliminarProducto();
@@ -47,8 +37,6 @@ function initFormularioProducto() {
 
         submitBtn.classList.remove("is-loading");
 
-        // apiRequest ya mostró la alerta de error si algo falló (p. ej. el
-        // CHECK de precio_venta >= precio_costo). Si data existe, fue éxito.
         if (data) {
             window.location.href = "/productos/";
         }
@@ -72,8 +60,6 @@ function initBotonesEliminarProducto() {
                 const fila = document.getElementById(`producto-${id}`);
                 if (fila) fila.remove();
             }
-            // Si falla por historial (FK -> error 1451), apiRequest ya mostró
-            // la alerta con el mensaje real que devuelve db.py.
         });
     });
 }
