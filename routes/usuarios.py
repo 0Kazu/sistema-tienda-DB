@@ -3,7 +3,7 @@ from db import run_write
 
 usuarios_bp = Blueprint('usuarios', __name__)
 
-# Guardia de seguridad exclusivo para este módulo
+# "Guardia" de seguridad exclusivo para este módulo
 @usuarios_bp.before_request
 def solo_admins():
     if session.get('rol') != 'Administrador':
@@ -25,9 +25,9 @@ def crear():
                 (nombre, correo, contrasena, rol)
             )
             flash(f"Usuario {nombre} ({rol}) creado exitosamente.", "success")
-            return redirect(url_for('index')) # Por ahora al index, luego puedes hacer una tabla de listar
+            return redirect(url_for('index')) 
         except Exception as e:
-            # Si intentas meter un correo duplicado, MaríaDB saltará aquí
+            
             flash(f"Error en la base de datos: {str(e)}", "danger")
             
     return render_template('usuarios/crear.html')

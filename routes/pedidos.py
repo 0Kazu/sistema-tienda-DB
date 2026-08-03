@@ -5,7 +5,7 @@ pedidos_bp = Blueprint('pedidos', __name__)
 
 @pedidos_bp.route('/')
 def listar():
-    # Usamos la vista que ya tienes creada en SQL
+    # Usamos la vista de nuestro .sql
     pedidos = run_query("SELECT * FROM vw_historial_pedidos ORDER BY fecha DESC")
     return render_template('pedidos/listar.html', pedidos=pedidos)
 
@@ -16,21 +16,17 @@ def crear():
         id_usuario = request.form['id_usuario']
         id_metodo_pago = request.form['id_metodo_pago']
         
-        # Insertar pedido con estado Pendiente y total 0
+        # Insertar pedido con estado Pendiente 
         sql = """
             INSERT INTO Pedido (id_cliente, id_usuario, id_metodo_pago, estado, total)
             VALUES (%s, %s, %s, 'Pendiente', 0)
         """
         id_pedido = run_write(sql, (id_cliente, id_usuario, id_metodo_pago))
         
-        # --- EL PARCHE PARA LA TUPLA ---
-        # Si la base de datos nos devuelve una tupla como (5,), sacamos el 5
         if isinstance(id_pedido, tuple):
             id_pedido = id_pedido[0]
-        # Si por alguna razón devuelve un diccionario como {'id': 5}, lo extraemos
         elif isinstance(id_pedido, dict):
             id_pedido = list(id_pedido.values())[0]
-        # -------------------------------
 
         if id_pedido:
             flash("Pedido creado exitosamente. Ahora agrega los productos.", "success")
@@ -79,13 +75,11 @@ def agregar_detalle(id_pedido):
 
     '''
     try:
-        # 1. Insertar el detalle (Aquí salta tu trigger si el pedido no es Pendiente o el producto es Inactivo)
         run_write("""
             INSERT INTO Detalle_Pedido (id_pedido, id_producto, cantidad, precio_unitario)
             VALUES (%s, %s, %s, %s)
         """, (id_pedido, id_producto, cantidad, precio_unitario))
         
-        # 2. Actualizar el total del Pedido
         run_write("""
             UPDATE Pedido 
             SET total = COALESCE(total, 0) + (%s * %s) 
@@ -99,7 +93,7 @@ def agregar_detalle(id_pedido):
     return redirect(url_for('pedidos.detalles', id_pedido=id_pedido))
     '''
     try:
-        # 1. Verificamos si el producto ya existe en este pedido
+        # Verificamos si el producto ya existe en este pedido
         existente = run_query(
             "SELECT cantidad FROM Detalle_Pedido WHERE id_pedido = %s AND id_producto = %s", 
             (id_pedido, id_producto)
@@ -113,13 +107,13 @@ def agregar_detalle(id_pedido):
                 WHERE id_pedido = %s AND id_producto = %s
             """, (cantidad, id_pedido, id_producto))
         else:
-            # Si no existe, lo INSERTAMOS como un producto nuevo en la lista
+            # Si no existe, hacemos un INSERT como un producto nuevo en la lista
             run_write("""
                 INSERT INTO Detalle_Pedido (id_pedido, id_producto, cantidad, precio_unitario)
                 VALUES (%s, %s, %s, %s)
             """, (id_pedido, id_producto, cantidad, precio_unitario))
         
-        # 2. Actualizar el total del Pedido (esto suma al total el (nuevo_monto * precio))
+        # Actualizar el total del Pedido (esto suma al total el (nuevo_monto * precio))
         run_write("""
             UPDATE Pedido 
             SET total = COALESCE(total, 0) + (%s * %s) 
@@ -130,6 +124,8 @@ def agregar_detalle(id_pedido):
     except Exception as e:
         flash(f"Error de base de datos: {str(e)}", "danger")
 
+    return redirect(url_for('pedidos.detalles', id_pedido=id_pedido))
+
 @pedidos_bp.route('/<int:id_pedido>/pagar', methods=['POST'])
 def pagar_pedido(id_pedido):
     try:
@@ -137,5 +133,5 @@ def pagar_pedido(id_pedido):
         call_procedure('sp_pagar_pedido', (id_pedido,))
         return jsonify({"status": "success", "message": "¡Pedido pagado exitosamente y stock actualizado!"})
     except Exception as e:
-        # Aquí atrapamos el SIGNAL SQLSTATE '45000' de falta de stock
+        # SIGNAL SQLSTATE '45000' de falta de stock
         return jsonify({"status": "error", "message": str(e)}), 400
