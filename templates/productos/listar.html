@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Productos · Gestor de Tienda{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-1">Productos</h1>
+            <p class="text-muted mb-0">Gestión del catálogo (RF01–RF04).</p>
+        </div>
+        <a href="{{ url_for('productos.nuevo') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Nuevo producto
+        </a>
+    </div>
+
+    <div class="alert alert-info small" role="alert">
+        <i class="bi bi-info-circle"></i>
+        Si un producto ya tiene historial de pedidos o ajustes de inventario, "Eliminar" será
+        rechazado por la base de datos (FK). Usa "Editar" para marcarlo como
+        <strong>Inactivo</strong> en su lugar (RB05).
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            {% if productos %}
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Proveedor</th>
+                        <th class="text-end">Costo</th>
+                        <th class="text-end">Venta</th>
+                        <th class="text-end">Stock</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in productos %}
+                    <tr id="producto-{{ p.id_producto }}">
+                        <td>{{ p.id_producto }}</td>
+                        <td>{{ p.nombre }}</td>
+                        <td>{{ p.categoria }}</td>
+                        <td>{{ p.proveedor }}</td>
+                        <td class="text-end">${{ "%.2f"|format(p.precio_costo) }}</td>
+                        <td class="text-end">${{ "%.2f"|format(p.precio_venta) }}</td>
+                        <td class="text-end">
+                            {{ p.stock_actual }} / {{ p.stock_minimo }}
+                            {% if p.stock_actual <= p.stock_minimo %}
+                                <span class="badge bg-warning text-dark ms-1">bajo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if p.estado == "Activo" %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ url_for('productos.editar', id_producto=p.id_producto) }}"
+                               class="btn btn-sm btn-outline-primary" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar-producto"
+                                    data-id="{{ p.id_producto }}" data-nombre="{{ p.nombre }}" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p class="text-muted p-4 mb-0">Todavía no hay productos registrados.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/productos.js') }}"></script>
+{% endblock %}

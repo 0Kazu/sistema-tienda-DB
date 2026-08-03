@@ -68,10 +68,12 @@ gestor_tienda_app/
     └── js/main.js            # showAlert() / apiRequest(): mostrar errores SQL como alertas
 ```
 
-## Hoja de ruta (próximos pasos)
+## Hoja de ruta
 
-1. **Gestión de Productos** (`routes/productos.py`) — CRUD completo,
-   borrado lógico si el producto tiene historial (RB05).
+1. ✅ **Gestión de Productos** (`routes/productos.py`) — listar, crear,
+   editar y eliminar. El borrado físico se apoya en las FK del script SQL:
+   si el producto tiene historial, MariaDB rechaza el DELETE (error 1451)
+   y el mensaje llega como alerta (RB05); para desactivarlo se usa "Editar".
 2. **Gestión de Clientes** (`routes/clientes.py`) — CRUD completo,
    bloqueo de borrado físico si tiene pedidos (RB07, disparado por
    `tg_prevent_delete_cliente`).
@@ -80,6 +82,18 @@ gestor_tienda_app/
    con transacción, control de stock y bloqueo de filas).
 4. Video de demostración con `SELECT` desde el gestor de BD después de
    cada acción (criterio 6 de la rúbrica).
+
+## Módulo Productos — cómo está armado
+
+- **Páginas** (`GET /productos/`, `/productos/nuevo`, `/productos/<id>/editar`):
+  HTML renderizado por Jinja, incluido `templates/productos/_form_campos.html`
+  (compartido entre crear y editar para no duplicar los `<select>` de
+  usuario/proveedor/categoría, que siempre se llenan con una consulta a la BD).
+- **Escrituras** (`POST/PUT/DELETE /productos/api...`): JSON puro, consumido
+  por `static/js/productos.js` con `fetch()`. Cualquier error de la BD
+  (CHECK, FK, etc.) llega ya traducido por `db.py` + el errorhandler de
+  `app.py`, y `apiRequest()` en `main.js` lo pinta como alerta sin recargar
+  la página.
 
 ## Notas de diseño
 

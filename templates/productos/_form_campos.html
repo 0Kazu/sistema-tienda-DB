@@ -1,0 +1,87 @@
+{# Se incluye desde productos/crear.html (producto=None) y productos/editar.html
+   (producto=dict con la fila actual). Los <select> de usuario/proveedor/categoría
+   se llenan siempre desde la BD, nunca hardcodeados, porque son FK. #}
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label for="nombre" class="form-label">Nombre del producto</label>
+        <input type="text" class="form-control" id="nombre" name="nombre" required maxlength="100"
+               value="{{ producto.nombre if producto else '' }}">
+    </div>
+
+    <div class="col-md-3">
+        <label for="precio_costo" class="form-label">Precio de costo</label>
+        <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number" step="0.01" min="0" class="form-control" id="precio_costo"
+                   name="precio_costo" required value="{{ producto.precio_costo if producto else '0.00' }}">
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <label for="precio_venta" class="form-label">Precio de venta</label>
+        <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number" step="0.01" min="0" class="form-control" id="precio_venta"
+                   name="precio_venta" required value="{{ producto.precio_venta if producto else '0.00' }}">
+        </div>
+        <div class="form-text">Debe ser ≥ al precio de costo (regla RB10, validada por la BD).</div>
+    </div>
+
+    <div class="col-md-3">
+        <label for="stock_actual" class="form-label">Stock actual</label>
+        <input type="number" min="0" class="form-control" id="stock_actual" name="stock_actual" required
+               value="{{ producto.stock_actual if producto else 0 }}">
+    </div>
+
+    <div class="col-md-3">
+        <label for="stock_minimo" class="form-label">Stock mínimo</label>
+        <input type="number" min="0" class="form-control" id="stock_minimo" name="stock_minimo" required
+               value="{{ producto.stock_minimo if producto else 0 }}">
+        <div class="form-text">Si el stock actual cae a este nivel o menos, aparece en "bajo stock" (RB11).</div>
+    </div>
+
+    <div class="col-md-3">
+        <label for="estado" class="form-label">Estado</label>
+        <select class="form-select" id="estado" name="estado">
+            <option value="Activo" {{ "selected" if not producto or producto.estado == "Activo" }}>Activo</option>
+            <option value="Inactivo" {{ "selected" if producto and producto.estado == "Inactivo" }}>Inactivo</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label for="id_usuario" class="form-label">Registrado por</label>
+        <select class="form-select" id="id_usuario" name="id_usuario" required>
+            <option value="" disabled {{ "selected" if not producto }}>Selecciona un usuario</option>
+            {% for u in usuarios %}
+            <option value="{{ u.id_usuario }}" {{ "selected" if producto and producto.id_usuario == u.id_usuario }}>
+                {{ u.nombre }} ({{ u.rol }})
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-6">
+        <label for="id_proveedor" class="form-label">Proveedor</label>
+        <select class="form-select" id="id_proveedor" name="id_proveedor" required>
+            <option value="" disabled {{ "selected" if not producto }}>Selecciona un proveedor</option>
+            {% for p in proveedores %}
+            <option value="{{ p.id_proveedor }}" {{ "selected" if producto and producto.id_proveedor == p.id_proveedor }}>
+                {{ p.nombre }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-6">
+        <label for="id_categoria" class="form-label">Categoría</label>
+        <select class="form-select" id="id_categoria" name="id_categoria" required>
+            <option value="" disabled {{ "selected" if not producto }}>Selecciona una categoría</option>
+            {% for c in categorias %}
+            <option value="{{ c.id_categoria }}" {{ "selected" if producto and producto.id_categoria == c.id_categoria }}>
+                {{ c.nombre }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+</div>

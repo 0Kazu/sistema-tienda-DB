@@ -11,6 +11,7 @@ from flask import Flask, render_template, jsonify
 
 import db
 from config import Config
+from routes.productos import bp as productos_bp
 
 
 def create_app():
@@ -19,6 +20,9 @@ def create_app():
 
     # Registra el cierre automático de la conexión a MariaDB al final de cada request
     db.init_app(app)
+
+    # Módulos CRUD (cada uno agrega su propio url_prefix, ver routes/*.py)
+    app.register_blueprint(productos_bp)
 
     # --- Manejo centralizado de errores SQL ---------------------------------
     # Cualquier DatabaseError levantado en db.py (violación de FK/CHECK,
