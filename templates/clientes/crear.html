@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo cliente · Gestor de Tienda{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Nuevo cliente</h1>
+        <a href="{{ url_for('clientes.listar') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Volver al listado
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form id="form-cliente" data-modo="crear">
+                {% include "clientes/_form_campos.html" %}
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i> Guardar cliente
+                    </button>
+                    <a href="{{ url_for('clientes.listar') }}" class="btn btn-light">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/clientes.js') }}"></script>
+{% endblock %}

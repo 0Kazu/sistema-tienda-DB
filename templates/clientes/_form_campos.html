@@ -1,0 +1,46 @@
+{# Se incluye desde clientes/crear.html (cliente=None) y clientes/editar.html
+   (cliente=dict con la fila actual). El <select> de usuario se llena
+   siempre desde la BD, nunca hardcodeado, porque es una FK. #}
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label for="nombre" class="form-label">Nombre completo</label>
+        <input type="text" class="form-control" id="nombre" name="nombre" required maxlength="100"
+               value="{{ cliente.nombre if cliente else '' }}">
+    </div>
+
+    <div class="col-md-3">
+        <label for="identificacion" class="form-label">Identificación</label>
+        <input type="text" class="form-control" id="identificacion" name="identificacion" maxlength="50"
+               placeholder="Cédula / RUC (opcional)"
+               value="{{ cliente.identificacion if cliente and cliente.identificacion else '' }}">
+    </div>
+
+    <div class="col-md-3">
+        <label for="telefono" class="form-label">Teléfono</label>
+        <input type="text" class="form-control" id="telefono" name="telefono" maxlength="20"
+               placeholder="Opcional"
+               value="{{ cliente.telefono if cliente and cliente.telefono else '' }}">
+    </div>
+
+    <div class="col-md-4">
+        <label for="estado" class="form-label">Estado</label>
+        <select class="form-select" id="estado" name="estado">
+            <option value="Activo" {{ "selected" if not cliente or cliente.estado == "Activo" }}>Activo</option>
+            <option value="Inactivo" {{ "selected" if cliente and cliente.estado == "Inactivo" }}>Inactivo</option>
+        </select>
+        <div class="form-text">Si el cliente ya tiene pedidos, usa "Inactivo" en vez de eliminarlo (RB07).</div>
+    </div>
+
+    <div class="col-md-8">
+        <label for="id_usuario" class="form-label">Registrado por</label>
+        <select class="form-select" id="id_usuario" name="id_usuario" required>
+            <option value="" disabled {{ "selected" if not cliente }}>Selecciona un usuario</option>
+            {% for u in usuarios %}
+            <option value="{{ u.id_usuario }}" {{ "selected" if cliente and cliente.id_usuario == u.id_usuario }}>
+                {{ u.nombre }} ({{ u.rol }})
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+</div>

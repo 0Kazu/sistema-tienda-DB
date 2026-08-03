@@ -12,6 +12,7 @@ from flask import Flask, render_template, jsonify
 import db
 from config import Config
 from routes.productos import bp as productos_bp
+from routes.clientes import bp as clientes_bp
 
 
 def create_app():
@@ -23,6 +24,7 @@ def create_app():
 
     # Módulos CRUD (cada uno agrega su propio url_prefix, ver routes/*.py)
     app.register_blueprint(productos_bp)
+    app.register_blueprint(clientes_bp)
 
     # --- Manejo centralizado de errores SQL ---------------------------------
     # Cualquier DatabaseError levantado en db.py (violación de FK/CHECK,
