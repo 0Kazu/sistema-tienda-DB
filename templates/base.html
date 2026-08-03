@@ -25,23 +25,95 @@
                             <i class="bi bi-speedometer2"></i> Inicio
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('productos.listar') }}">
-                            <i class="bi bi-box-seam"></i> Productos
-                        </a>
-                    </li>
-                    <!-- Los siguientes módulos se habilitan en los próximos pasos -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('clientes.listar') }}">
-                            <i class="bi bi-people"></i> Clientes
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">
-                            <i class="bi bi-receipt"></i> Pedidos
-                        </a>
-                    </li>
+                    {% if 'id_usuario' in session %}
+                        <!-- Inventario: Admin y Bodeguero -->
+                        {% if session.get('rol') in ['Administrador', 'Bodeguero'] %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('productos.listar') }}">
+                                <i class="bi bi-box-seam"></i> Productos
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <!-- Ventas: Admin y Vendedor -->
+                        {% if session.get('rol') in ['Administrador', 'Vendedor'] %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('clientes.listar') }}"><i class="bi bi-people"></i> Clientes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('pedidos.listar') }}"><i class="bi bi-receipt"></i> Pedidos</a></li>
+                        {% endif %}
+                    {% endif %}
+                    <!--
+                    {% if 'id_usuario' in session %}
+                        {% if session.get('rol') in ['Administrador', 'Bodeguero'] %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('productos.listar') }}">
+                                <i class="bi bi-box-seam"></i> Productos
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% if session.get('rol') in ['Administrador', 'Vendedor'] %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('clientes.listar') }}">
+                                <i class="bi bi-people"></i> Clientes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="{{ url_for('pedidos.listar') }}">
+                                <i class="bi bi-receipt"></i> Pedidos
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endif %}
+                    -->
                 </ul>
+                
+                
+                <!--
+                <ul class="navbar-nav ms-auto">
+                    {% if 'id_usuario' in session %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle font-weight-bold text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                {{ session.get('nombre') }} ({{ session.get('rol') }})
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                {% if session.get('rol') == 'Administrador' %}
+                                    <li><a class="dropdown-item" href="{{ url_for('usuarios.crear') }}">Agregar Nuevo Personal</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">Cerrar Sesión</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-light btn-sm" href="{{ url_for('auth.login') }}">Iniciar Sesión</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                -->
+                <ul class="navbar-nav ms-auto">
+                {% if 'id_usuario' in session %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white font-weight-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            {{ session.get('nombre') }} ({{ session.get('rol') }})
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            
+                            <!-- ESTO ES LO QUE FALTABA: Solo el Admin ve este botón -->
+                            {% if session.get('rol') == 'Administrador' %}
+                                <li><a class="dropdown-item" href="{{ url_for('usuarios.crear') }}">Agregar Nuevo Personal</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            
+                            <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">Cerrar Sesión</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-light btn-sm" href="{{ url_for('auth.login') }}">Iniciar Sesión</a>
+                        </li>
+                    {% endif %}
+                </ul>
+
             </div>
         </div>
     </nav>

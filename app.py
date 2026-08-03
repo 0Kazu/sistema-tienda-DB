@@ -8,11 +8,15 @@ Blueprints dentro de routes/ en los siguientes pasos, y se registrarán
 aquí con app.register_blueprint(...).
 """
 from flask import Flask, render_template, jsonify
+from flask import request, session, redirect, url_for, flash
 
 import db
 from config import Config
 from routes.productos import bp as productos_bp
 from routes.clientes import bp as clientes_bp
+from routes.pedidos import pedidos_bp
+from routes.auth import auth_bp
+from routes.usuarios import usuarios_bp
 
 
 def create_app():
@@ -25,6 +29,9 @@ def create_app():
     # Módulos CRUD (cada uno agrega su propio url_prefix, ver routes/*.py)
     app.register_blueprint(productos_bp)
     app.register_blueprint(clientes_bp)
+    app.register_blueprint(pedidos_bp, url_prefix='/pedidos')
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(usuarios_bp, url_prefix='/usuarios')
 
     # --- Manejo centralizado de errores SQL ---------------------------------
     # Cualquier DatabaseError levantado en db.py (violación de FK/CHECK,
@@ -32,6 +39,15 @@ def create_app():
     # sp_pagar_pedido) llega aquí y se convierte en una respuesta JSON
     # que el frontend puede mostrar como alerta, sin que cada ruta tenga
     # que hacer su propio try/except.
+    @app.before_request
+    def proteger_rutas():
+        rutas_publicas = ['auth.login', 'static']
+        
+        # Si alguien intenta ir a una ruta privada y no tiene sesión, lo pateamos al login
+        if request.endpoint not in rutas_publicas and 'id_usuario' not in session:
+            flash("Acceso denegado. Por favor, inicia sesión.", "warning")
+            return redirect(url_for('auth.login'))
+
     @app.errorhandler(db.DatabaseError)
     def handle_database_error(error):
         return jsonify(error.to_dict()), 400

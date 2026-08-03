@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card mt-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Registrar Nuevo Personal</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('usuarios.crear') }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" name="nombre" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Correo Electrónico</label>
+                        <input type="email" name="correo" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña Temporal</label>
+                        <input type="text" name="contrasena" class="form-control" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Rol en el Sistema</label>
+                        <select name="rol" class="form-select" required>
+                            <option value="Administrador">Administrador (Acceso Total)</option>
+                            <option value="Vendedor">Vendedor (Caja y Clientes)</option>
+                            <option value="Bodeguero">Bodeguero (Inventario)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Crear Usuario</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

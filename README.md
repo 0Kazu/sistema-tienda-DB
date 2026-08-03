@@ -74,9 +74,11 @@ gestor_tienda_app/
    editar y eliminar. El borrado físico se apoya en las FK del script SQL:
    si el producto tiene historial, MariaDB rechaza el DELETE (error 1451)
    y el mensaje llega como alerta (RB05); para desactivarlo se usa "Editar".
-2. **Gestión de Clientes** (`routes/clientes.py`) — CRUD completo,
-   bloqueo de borrado físico si tiene pedidos (RB07, disparado por
-   `tg_prevent_delete_cliente`).
+2. ✅ **Gestión de Clientes** (`routes/clientes.py`) — listar, crear,
+   editar y eliminar. El borrado físico está protegido por el trigger
+   `tg_prevent_delete_cliente`: si el cliente tiene pedidos, el SIGNAL
+   SQLSTATE '45000' del trigger llega intacto hasta la alerta del
+   frontend (RB07); para desactivarlo se usa "Editar".
 3. **Gestión de Pedidos** (`routes/pedidos.py`) — crear pedido, agregar
    detalle, y cambiar estado llamando a `sp_pagar_pedido` (procedimiento
    con transacción, control de stock y bloqueo de filas).
