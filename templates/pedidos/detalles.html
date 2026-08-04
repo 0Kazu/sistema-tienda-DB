@@ -42,6 +42,10 @@
                     <th>Cantidad</th>
                     <th>Precio Unit.</th>
                     <th>Subtotal</th>
+                    <!-- Añadimos la columna de Acciones si está Pendiente -->
+                    {% if pedido.estado == 'Pendiente' %}
+                    <th>Acciones</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -51,9 +55,22 @@
                     <td>{{ d.cantidad }}</td>
                     <td>${{ d.precio_unitario }}</td>
                     <td>${{ d.cantidad * d.precio_unitario }}</td>
+                    
+                    <!-- Botón de eliminar solo visible si el pedido no se ha pagado -->
+                    {% if pedido.estado == 'Pendiente' %}
+                    <td>
+                        <form action="{{ url_for('pedidos.eliminar_detalle', id_pedido=pedido.id_pedido, id_producto=d.id_producto) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Quitar este producto del carrito?');">
+                                Eliminar
+                            </button>
+                        </form>
+                    </td>
+                    {% endif %}
                 </tr>
                 {% else %}
-                <tr><td colspan="4" class="text-center">Aún no hay productos en esta orden.</td></tr>
+                <tr>
+                    <td colspan="5" class="text-center">Aún no hay productos en esta orden.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

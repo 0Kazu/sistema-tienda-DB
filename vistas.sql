@@ -1,3 +1,5 @@
+USE gestor_tienda_db;
+
 -- Vistas
 -- VISTA 1: Productos con bajo stock (Para el Bodeguero)
 DROP VIEW IF EXISTS vw_productos_bajo_stock;
@@ -59,6 +61,21 @@ SELECT id_usuario, nombre FROM Usuario WHERE estado = 'Activo';
 CREATE OR REPLACE VIEW vw_productos_activos AS 
 SELECT id_producto, nombre, precio_venta, stock_actual FROM Producto WHERE estado = 'Activo';
 
--- Admin por defecto
-INSERT INTO Usuario(nombre, correo, contrasena, estado)
-VALUES ('Diego', 'admin@tienda.com', '12345', 'Activo')
+USE gestor_tienda_db;
+
+-- 2. Crear Proveedor y Categoría (Obligatorios para Producto)
+INSERT INTO Proveedor (nombre, contacto) 
+VALUES ('Importadora Tech', '0991234567');
+
+INSERT INTO Categoria (nombre, descripcion) 
+VALUES ('Periféricos', 'Teclados, mouses y audífonos');
+
+-- 3. Crear Productos
+INSERT INTO Producto (nombre, precio_costo, precio_venta, stock_actual, stock_minimo, id_usuario, id_proveedor, id_categoria)
+VALUES 
+-- Producto 1: Todo normal (Stock 30, Mínimo 10)
+('Mouse Inalámbrico', 10.00, 20.00, 30, 10, 1, 1, 1),
+
+-- Producto 2: ¡STOCK BAJO! (Stock 2, Mínimo 5). Este debería aparecer en tu web.
+('Teclado Mecánico', 35.00, 60.00, 2, 5, 1, 1, 1);
+

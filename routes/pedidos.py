@@ -5,7 +5,7 @@ pedidos_bp = Blueprint('pedidos', __name__)
 
 @pedidos_bp.route('/')
 def listar():
-    # Usamos la vista de nuestro .sql
+    # El backend solo llama a la vista, cero lógica
     pedidos = run_query("SELECT * FROM vw_historial_pedidos ORDER BY fecha DESC")
     return render_template('pedidos/listar.html', pedidos=pedidos)
 
@@ -16,27 +16,28 @@ def crear():
         id_usuario = request.form['id_usuario']
         id_metodo_pago = request.form['id_metodo_pago']
         
-        # Insertar pedido con estado Pendiente 
-        sql = """
-            INSERT INTO Pedido (id_cliente, id_usuario, id_metodo_pago, estado, total)
-            VALUES (%s, %s, %s, 'Pendiente', 0)
-        """
-        id_pedido = run_write(sql, (id_cliente, id_usuario, id_metodo_pago))
-        
-        if isinstance(id_pedido, tuple):
-            id_pedido = id_pedido[0]
-        elif isinstance(id_pedido, dict):
-            id_pedido = list(id_pedido.values())[0]
+        try:
+            # En lugar de inyectar el INSERT, delegamos a la base de datos
+            # Nota: Como es difícil capturar el parámetro OUT en PyMySQL directamente, 
+            # hacemos el INSERT limpio y pedimos el ID en la misma transacción.
+            id_pedido = run_write("""
+                INSERT INTO Pedido (id_cliente, id_usuario, id_metodo_pago, estado, total)
+                VALUES (%s, %s, %s, 'Pendiente', 0)
+            """, (id_cliente, id_usuario, id_metodo_pago))
+            
+            if isinstance(id_pedido, tuple):
+                id_pedido = id_pedido[0]
+            elif isinstance(id_pedido, dict):
+                id_pedido = list(id_pedido.values())[0]
 
-        if id_pedido:
-            flash("Pedido creado exitosamente. Ahora agrega los productos.", "success")
+            flash("Pedido creado. Agrega los productos.", "success")
             return redirect(url_for('pedidos.detalles', id_pedido=id_pedido))
-        
-        flash("Error al crear el pedido.", "danger")
+        except Exception as e:
+            flash(f"Error al crear pedido: {str(e)}", "danger")
 
-    # Si es GET, cargamos los datos para los selects
-    clientes = run_query("SELECT id_cliente, nombre FROM Cliente WHERE estado = 'Activo'")
-    usuarios = run_query("SELECT id_usuario, nombre FROM Usuario WHERE estado = 'Activo'")
+    # Reemplazamos los SELECT crudos por las Vistas limpias
+    clientes = run_query("SELECT * FROM vw_clientes_activos")
+    usuarios = run_query("SELECT * FROM vw_usuarios_activos")
     metodos_pago = run_query("SELECT id_metodo_pago, nombre FROM Metodo_Pago")
     
     return render_template('pedidos/crear.html', clientes=clientes, usuarios=usuarios, metodos_pago=metodos_pago)
@@ -55,8 +56,8 @@ def detalles(id_pedido):
         WHERE dp.id_pedido = %s
     """, (id_pedido,))
     
-    # Solo mandamos productos activos para el select
-    productos = run_query("SELECT id_producto, nombre, precio_venta, stock_actual FROM Producto WHERE estado = 'Activo'")
+    # Python solo llama a la vista de productos activos
+    productos = run_query("SELECT * FROM vw_productos_activos")
     
     return render_template('pedidos/detalles.html', pedido=pedido[0], detalles=detalles_pedido, productos=productos)
 
@@ -65,73 +66,32 @@ def agregar_detalle(id_pedido):
     id_producto = request.form['id_producto']
     cantidad = int(request.form['cantidad'])
     
-    # Obtener el precio actual del producto
-    producto = run_query("SELECT precio_venta FROM Producto WHERE id_producto = %s", (id_producto,))
-    if not producto:
-        flash("Producto inválido.", "danger")
-        return redirect(url_for('pedidos.detalles', id_pedido=id_pedido))
-        
-    precio_unitario = producto[0]['precio_venta']
-
-    '''
     try:
-        run_write("""
-            INSERT INTO Detalle_Pedido (id_pedido, id_producto, cantidad, precio_unitario)
-            VALUES (%s, %s, %s, %s)
-        """, (id_pedido, id_producto, cantidad, precio_unitario))
-        
-        run_write("""
-            UPDATE Pedido 
-            SET total = COALESCE(total, 0) + (%s * %s) 
-            WHERE id_pedido = %s
-        """, (cantidad, precio_unitario, id_pedido))
-        
-        flash("Producto agregado al pedido.", "success")
+        # ¡Magia pura! Toda la lógica de "Upsert", validación de stock y sumar totales
+        # ahora vive 100% en el Procedimiento Almacenado. Python solo le pasa los datos.
+        call_procedure('sp_agregar_detalle', (id_pedido, id_producto, cantidad))
+        flash("Producto agregado/actualizado en el carrito.", "success")
     except Exception as e:
         flash(f"Error de base de datos: {str(e)}", "danger")
         
     return redirect(url_for('pedidos.detalles', id_pedido=id_pedido))
-    '''
+
+# --- NUEVA RUTA PARA ELIMINAR PRODUCTOS DEL CARRITO ---
+@pedidos_bp.route('/<int:id_pedido>/eliminar_detalle/<int:id_producto>', methods=['POST'])
+def eliminar_detalle(id_pedido, id_producto):
     try:
-        # Verificamos si el producto ya existe en este pedido
-        existente = run_query(
-            "SELECT cantidad FROM Detalle_Pedido WHERE id_pedido = %s AND id_producto = %s", 
-            (id_pedido, id_producto)
-        )
-
-        if existente:
-            # Si existe, SUMAMOS la nueva cantidad a la que ya tenía
-            run_write("""
-                UPDATE Detalle_Pedido 
-                SET cantidad = cantidad + %s 
-                WHERE id_pedido = %s AND id_producto = %s
-            """, (cantidad, id_pedido, id_producto))
-        else:
-            # Si no existe, hacemos un INSERT como un producto nuevo en la lista
-            run_write("""
-                INSERT INTO Detalle_Pedido (id_pedido, id_producto, cantidad, precio_unitario)
-                VALUES (%s, %s, %s, %s)
-            """, (id_pedido, id_producto, cantidad, precio_unitario))
-        
-        # Actualizar el total del Pedido (esto suma al total el (nuevo_monto * precio))
-        run_write("""
-            UPDATE Pedido 
-            SET total = COALESCE(total, 0) + (%s * %s) 
-            WHERE id_pedido = %s
-        """, (cantidad, precio_unitario, id_pedido))
-        
-        flash("Producto agregado/actualizado en el carrito.", "success")
+        # Llamamos al procedimiento que elimina la fila y resta el subtotal del total del pedido
+        call_procedure('sp_eliminar_detalle', (id_pedido, id_producto))
+        flash("Producto eliminado del pedido.", "info")
     except Exception as e:
-        flash(f"Error de base de datos: {str(e)}", "danger")
-
+        flash(f"No se pudo eliminar el producto: {str(e)}", "danger")
+        
     return redirect(url_for('pedidos.detalles', id_pedido=id_pedido))
 
 @pedidos_bp.route('/<int:id_pedido>/pagar', methods=['POST'])
 def pagar_pedido(id_pedido):
     try:
-        # LLAMADA CRÍTICA AL PROCEDIMIENTO ALMACENADO
         call_procedure('sp_pagar_pedido', (id_pedido,))
-        return jsonify({"status": "success", "message": "¡Pedido pagado exitosamente y stock actualizado!"})
+        return jsonify({"status": "success", "message": "¡Pedido pagado exitosamente!"})
     except Exception as e:
-        # SIGNAL SQLSTATE '45000' de falta de stock
         return jsonify({"status": "error", "message": str(e)}), 400

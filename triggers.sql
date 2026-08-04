@@ -1,3 +1,5 @@
+USE gestor_tienda_db;
+
 -- Triggers
 -- Trigger 1
 DROP TRIGGER IF EXISTS tg_ajuste_inventario_after_insert;

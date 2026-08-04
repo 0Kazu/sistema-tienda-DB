@@ -1,3 +1,5 @@
+USE gestor_tienda_db;
+
 -- Procedimiento Pagar Pedido
 DELIMITER //
 DROP PROCEDURE IF EXISTS sp_pagar_pedido //
