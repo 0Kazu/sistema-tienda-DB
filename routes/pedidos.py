@@ -5,8 +5,16 @@ pedidos_bp = Blueprint('pedidos', __name__)
 
 @pedidos_bp.route('/')
 def listar():
-    # El backend solo llama a la vista, cero lógica
+    '''
     pedidos = run_query("SELECT * FROM vw_historial_pedidos ORDER BY fecha DESC")
+    return render_template('pedidos/listar.html', pedidos=pedidos)
+    '''
+    # Extraemos quién está usando el sistema
+    rol = session.get('rol')
+    id_usuario = session.get('id_usuario')
+    
+    # La base de datos decide qué devolver usando el SP
+    pedidos = run_query("CALL sp_listar_pedidos(%s, %s)", (rol, id_usuario))
     return render_template('pedidos/listar.html', pedidos=pedidos)
 
 @pedidos_bp.route('/crear', methods=['GET', 'POST'])

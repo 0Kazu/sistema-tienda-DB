@@ -19,15 +19,11 @@ def crear():
         rol = request.form['rol']
         
         try:
-            # Insertar en la BD
-            run_write(
-                "INSERT INTO Usuario (nombre, correo, contrasena, rol) VALUES (%s, %s, %s, %s)",
-                (nombre, correo, contrasena, rol)
-            )
+            from db import call_procedure
+            call_procedure('sp_crear_usuario', (nombre, correo, contrasena, rol))
             flash(f"Usuario {nombre} ({rol}) creado exitosamente.", "success")
-            return redirect(url_for('index')) 
+            return redirect(url_for('index'))
         except Exception as e:
-            
             flash(f"Error en la base de datos: {str(e)}", "danger")
             
     return render_template('usuarios/crear.html')

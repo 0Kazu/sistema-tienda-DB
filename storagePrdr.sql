@@ -154,3 +154,41 @@ BEGIN
     DELETE FROM Pedido WHERE id_pedido = p_id_pedido;
 END //
 DELIMITER ;
+
+DELIMITER //
+
+-- SP para listar pedidos según el ROL (Tu regla de negocio)
+DROP PROCEDURE IF EXISTS sp_listar_pedidos //
+CREATE PROCEDURE sp_listar_pedidos(IN p_rol VARCHAR(50), IN p_id_usuario INT)
+BEGIN
+    IF p_rol = 'Administrador' THEN
+        -- El Admin ve absolutamente todo
+        SELECT * FROM vw_historial_pedidos ORDER BY fecha DESC;
+    ELSE
+        -- El Vendedor solo ve los suyos
+        SELECT * FROM vw_historial_pedidos WHERE id_usuario = p_id_usuario ORDER BY fecha DESC;
+    END IF;
+END //
+
+-- SP para crear Categorías
+DROP PROCEDURE IF EXISTS sp_crear_categoria //
+CREATE PROCEDURE sp_crear_categoria(IN p_nombre VARCHAR(100), IN p_descripcion TEXT)
+BEGIN
+    INSERT INTO Categoria (nombre, descripcion) VALUES (p_nombre, p_descripcion);
+END //
+
+-- SP para crear Usuarios
+DROP PROCEDURE IF EXISTS sp_crear_usuario //
+CREATE PROCEDURE sp_crear_usuario(
+    IN p_nombre VARCHAR(100), 
+    IN p_correo VARCHAR(100), 
+    IN p_contrasena VARCHAR(255), 
+    IN p_rol VARCHAR(50)
+)
+BEGIN
+    INSERT INTO Usuario (nombre, correo, contrasena, rol, estado) 
+    VALUES (p_nombre, p_correo, p_contrasena, p_rol, 'Activo');
+END //
+
+DELIMITER ;
+

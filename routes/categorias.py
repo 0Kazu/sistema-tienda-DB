@@ -12,8 +12,7 @@ def check_rol():
 
 @categorias_bp.route('/')
 def listar():
-    # Una consulta sencilla, no requiere joins complejos
-    categorias = run_query("SELECT * FROM Categoria ORDER BY id_categoria DESC")
+    ategorias = run_query("SELECT * FROM vw_lista_categorias")
     return render_template('categorias/listar.html', categorias=categorias)
 
 @categorias_bp.route('/crear', methods=['POST'])
@@ -22,10 +21,9 @@ def crear():
     descripcion = request.form.get('descripcion', '')
     
     try:
-        run_write(
-            "INSERT INTO Categoria (nombre, descripcion) VALUES (%s, %s)", 
-            (nombre, descripcion)
-        )
+        # Reemplazo del INSERT por el SP
+        from db import call_procedure
+        call_procedure('sp_crear_categoria', (nombre, descripcion))
         flash("Categoría agregada exitosamente.", "success")
     except Exception as e:
         flash(f"Error al crear la categoría: {str(e)}", "danger")

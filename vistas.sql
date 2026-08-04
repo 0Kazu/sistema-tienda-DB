@@ -86,6 +86,21 @@ SELECT id_categoria, nombre FROM Categoria;
 CREATE OR REPLACE VIEW vw_proveedores_activos AS 
 SELECT id_proveedor, nombre FROM Proveedor WHERE estado = 'Activo';
 
+-- Vista para el Login
+CREATE OR REPLACE VIEW vw_auth_usuarios AS
+SELECT id_usuario, nombre, correo, contrasena, rol, estado FROM Usuario;
+
+-- Vista para listar Categorías
+CREATE OR REPLACE VIEW vw_lista_categorias AS
+SELECT * FROM Categoria ORDER BY id_categoria DESC;
+
+-- Reemplazamos la vista de historial para ASEGURARNOS de que incluya el id_usuario
+CREATE OR REPLACE VIEW vw_historial_pedidos AS
+SELECT p.id_pedido, p.fecha, c.nombre AS cliente, u.nombre AS vendedor, p.total, p.estado, p.id_usuario
+FROM Pedido p
+JOIN Cliente c ON p.id_cliente = c.id_cliente
+JOIN Usuario u ON p.id_usuario = u.id_usuario;
+
 USE gestor_tienda_db;
 
 -- 2. Crear Proveedor y Categoría (Obligatorios para Producto)
