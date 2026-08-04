@@ -227,3 +227,64 @@ END //
 
 DELIMITER ;
 
+DELIMITER //
+
+-- SP para crear un nuevo producto
+DROP PROCEDURE IF EXISTS sp_crear_producto //
+CREATE PROCEDURE sp_crear_producto(
+    IN p_nombre VARCHAR(150),
+    IN p_id_categoria INT,
+    IN p_id_proveedor INT,
+    IN p_precio_costo DECIMAL(10,2),
+    IN p_precio_venta DECIMAL(10,2),
+    IN p_stock_actual INT,
+    IN p_stock_minimo INT
+)
+BEGIN
+    INSERT INTO Producto (
+        nombre, id_categoria, id_proveedor, 
+        precio_costo, precio_venta, 
+        stock_actual, stock_minimo, estado
+    ) VALUES (
+        p_nombre, p_id_categoria, p_id_proveedor, 
+        p_precio_costo, p_precio_venta, 
+        p_stock_actual, p_stock_minimo, 'Activo'
+    );
+END //
+
+-- SP para actualizar un producto
+DROP PROCEDURE IF EXISTS sp_actualizar_producto //
+CREATE PROCEDURE sp_actualizar_producto(
+    IN p_id_producto INT,
+    IN p_nombre VARCHAR(150),
+    IN p_id_categoria INT,
+    IN p_id_proveedor INT,
+    IN p_precio_costo DECIMAL(10,2),
+    IN p_precio_venta DECIMAL(10,2),
+    IN p_stock_actual INT,
+    IN p_stock_minimo INT,
+    IN p_estado ENUM('Activo', 'Inactivo', 'Agotado')
+)
+BEGIN
+    UPDATE Producto
+    SET nombre = p_nombre,
+        id_categoria = p_id_categoria,
+        id_proveedor = p_id_proveedor,
+        precio_costo = p_precio_costo,
+        precio_venta = p_precio_venta,
+        stock_actual = p_stock_actual,
+        stock_minimo = p_stock_minimo,
+        estado = p_estado
+    WHERE id_producto = p_id_producto;
+END //
+
+-- SP para eliminación lógica (cambiar estado en lugar de borrar para no dañar facturas viejas)
+DROP PROCEDURE IF EXISTS sp_eliminar_producto //
+CREATE PROCEDURE sp_eliminar_producto(
+    IN p_id_producto INT
+)
+BEGIN
+    UPDATE Producto SET estado = 'Inactivo' WHERE id_producto = p_id_producto;
+END //
+
+DELIMITER ;
