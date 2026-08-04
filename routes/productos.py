@@ -9,19 +9,9 @@ bp = Blueprint("productos", __name__, url_prefix="/productos")
 
 @bp.route("/")
 def listar():
-    # Falta por hacer VIEWS
-    productos = db.run_query(
-        """
-        SELECT p.id_producto, p.nombre, p.precio_costo, p.precio_venta,
-               p.stock_actual, p.stock_minimo, p.estado,
-               pr.nombre AS proveedor, c.nombre AS categoria
-        FROM Producto p
-        JOIN Proveedor pr ON p.id_proveedor = pr.id_proveedor
-        JOIN Categoria c ON p.id_categoria = c.id_categoria
-        ORDER BY p.id_producto DESC
-        """
-    )
-    return render_template("productos/listar.html", productos=productos)
+    # Llamada directa a la vista
+    productos = run_query("SELECT * FROM vw_lista_productos")
+    return render_template('productos/listar.html', productos=productos)
 
 
 @bp.route("/nuevo")

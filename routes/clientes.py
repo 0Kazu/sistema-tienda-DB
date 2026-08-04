@@ -9,16 +9,9 @@ bp = Blueprint("clientes", __name__, url_prefix="/clientes")
 # Proximo a cambiar: Crear Views
 @bp.route("/")
 def listar():
-    clientes = db.run_query(
-        """
-        SELECT c.id_cliente, c.nombre, c.identificacion, c.telefono, c.estado,
-               u.nombre AS registrado_por
-        FROM Cliente c
-        JOIN Usuario u ON c.id_usuario = u.id_usuario
-        ORDER BY c.id_cliente DESC
-        """
-    )
-    return render_template("clientes/listar.html", clientes=clientes)
+    # ¡Mira qué limpio! Python solo llama a la vista y ya.
+    clientes = run_query("SELECT * FROM vw_lista_clientes")
+    return render_template('clientes/listar.html', clientes=clientes)
 
 
 @bp.route("/nuevo")
