@@ -1,5 +1,4 @@
 #Punto de entrada de la aplicación.
-
 from flask import Flask, render_template, jsonify
 from flask import request, session, redirect, url_for, flash
 

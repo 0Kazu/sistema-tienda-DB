@@ -19,7 +19,7 @@ def login():
         )
         
         if usuario:
-            # Si login sale bien xD
+            # Si login sale bien
             session['id_usuario'] = usuario[0]['id_usuario']
             session['nombre'] = usuario[0]['nombre']
             session['rol'] = usuario[0]['rol']

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from db import run_query, call_procedure
 
-bp = Blueprint('clientes', __name__)
+bp = Blueprint("clientes", __name__, url_prefix="/clientes")
 
 @bp.route('/')
 def listar():
