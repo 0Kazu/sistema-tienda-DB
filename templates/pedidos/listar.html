@@ -1,38 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Gestión de Pedidos</h2>
-    <a href="{{ url_for('pedidos.crear') }}" class="btn btn-primary">+ Nuevo Pedido</a>
-</div>
 
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Fecha</th>
-            <th>Cliente</th>
-            <th>Total</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for p in pedidos %}
-        <tr>
-            <td>{{ p.id_pedido }}</td>
-            <td>{{ p.fecha }}</td>
-            <td>{{ p.cliente }}</td>
-            <td>${{ p.total if p.total else '0.00' }}</td>
-            <td>
-                <span class="badge bg-{{ 'success' if p.estado == 'Pagado' else 'warning' if p.estado == 'Pendiente' else 'danger' }}">
-                    {{ p.estado }}
-                </span>
-            </td>
-            <td>
-                <a href="{{ url_for('pedidos.detalles', id_pedido=p.id_pedido) }}" class="btn btn-sm btn-info">Ver / Gestionar</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h1 class="h3 mb-1">Pedidos</h1>
+                <p class="text-muted mb-0">Gestión de pedidos.</p>
+            </div>
+            <a href="{{ url_for('pedidos.crear') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Nuevo cliente
+            </a>
+    </div>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in pedidos %}
+            <tr>
+                <td>{{ p.id_pedido }}</td>
+                <td>{{ p.fecha }}</td>
+                <td>{{ p.cliente }}</td>
+                <td>${{ p.total if p.total else '0.00' }}</td>
+                <td>
+                    <span class="badge bg-{{ 'success' if p.estado == 'Pagado' else 'warning' if p.estado == 'Pendiente' else 'danger' }}">
+                        {{ p.estado }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{{ url_for('pedidos.detalles', id_pedido=p.id_pedido) }}" class="btn btn-sm btn-info">Ver / Gestionar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

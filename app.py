@@ -10,6 +10,7 @@ from routes.clientes import bp as clientes_bp
 from routes.pedidos import pedidos_bp
 from routes.auth import auth_bp
 from routes.usuarios import usuarios_bp
+from routes.categorias import categorias_bp
 
 
 def create_app():
@@ -25,6 +26,7 @@ def create_app():
     app.register_blueprint(pedidos_bp, url_prefix='/pedidos')
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(usuarios_bp, url_prefix='/usuarios')
+    app.register_blueprint(categorias_bp, url_prefix='/categorias')
 
     # --- Manejo centralizado de errores SQL ---
     @app.before_request
