@@ -5,7 +5,7 @@ bp = Blueprint("clientes", __name__, url_prefix="/clientes")
 
 @bp.route('/')
 def listar():
-    # 100% limpio: Llamada a la vista
+    # Llamada a la vista
     clientes = run_query("SELECT * FROM vw_lista_clientes")
     return render_template('clientes/listar.html', clientes=clientes)
 
@@ -20,7 +20,7 @@ def crear():
         id_usuario = session.get('id_usuario')
 
         try:
-            # 100% limpio: Llamada al Procedimiento Almacenado
+            # Llamada al Procedimiento Almacenado
             call_procedure('sp_crear_cliente', (identificacion, nombre, telefono, id_usuario))
             flash("Cliente registrado exitosamente.", "success")
             return redirect(url_for('clientes.listar'))
@@ -38,7 +38,7 @@ def editar(id_cliente):
         estado = request.form['estado']
 
         try:
-            # Pasamos id_cliente al procedimiento almacenado
+            # Pasar id_cliente al procedimiento almacenado
             call_procedure('sp_actualizar_cliente', (id_cliente, identificacion, nombre, telefono, estado))
             flash("Datos del cliente actualizados.", "success")
             return redirect(url_for('clientes.listar'))
