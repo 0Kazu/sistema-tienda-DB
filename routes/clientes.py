@@ -29,8 +29,8 @@ def crear():
 
     return render_template('clientes/crear.html')
 
-@bp.route('/<int:id>/editar', methods=['GET', 'POST'])
-def editar(id):
+@bp.route('/<int:id_cliente>/editar', methods=['GET', 'POST'])
+def editar(id_cliente):
     if request.method == 'POST':
         identificacion = request.form['identificacion']
         nombre = request.form['nombre']
@@ -38,15 +38,15 @@ def editar(id):
         estado = request.form['estado']
 
         try:
-            # 100% limpio: Llamada al Procedimiento Almacenado
-            call_procedure('sp_actualizar_cliente', (id, identificacion, nombre, telefono, estado))
+            # Pasamos id_cliente al procedimiento almacenado
+            call_procedure('sp_actualizar_cliente', (id_cliente, identificacion, nombre, telefono, estado))
             flash("Datos del cliente actualizados.", "success")
             return redirect(url_for('clientes.listar'))
         except Exception as e:
             flash(f"Error al actualizar: {str(e)}", "danger")
 
-    # Consulta básica por llave primaria (aceptable en Python)
-    cliente = run_query("SELECT * FROM Cliente WHERE id_cliente = %s", (id,))
+    # Usamos id_cliente en la consulta de búsqueda
+    cliente = run_query("SELECT * FROM Cliente WHERE id_cliente = %s", (id_cliente,))
     if not cliente:
         flash("Cliente no encontrado.", "danger")
         return redirect(url_for('clientes.listar'))
