@@ -192,3 +192,38 @@ END //
 
 DELIMITER ;
 
+DELIMITER //
+
+-- SP para crear un nuevo cliente
+DROP PROCEDURE IF EXISTS sp_crear_cliente //
+CREATE PROCEDURE sp_crear_cliente(
+    IN p_identificacion VARCHAR(20),
+    IN p_nombre VARCHAR(100),
+    IN p_telefono VARCHAR(20),
+    IN p_id_usuario INT
+)
+BEGIN
+    INSERT INTO Cliente (identificacion, nombre, telefono, id_usuario, estado)
+    VALUES (p_identificacion, p_nombre, p_telefono, p_id_usuario, 'Activo');
+END //
+
+-- SP para actualizar un cliente existente
+DROP PROCEDURE IF EXISTS sp_actualizar_cliente //
+CREATE PROCEDURE sp_actualizar_cliente(
+    IN p_id_cliente INT,
+    IN p_identificacion VARCHAR(20),
+    IN p_nombre VARCHAR(100),
+    IN p_telefono VARCHAR(20),
+    IN p_estado ENUM('Activo', 'Inactivo')
+)
+BEGIN
+    UPDATE Cliente
+    SET identificacion = p_identificacion,
+        nombre = p_nombre,
+        telefono = p_telefono,
+        estado = p_estado
+    WHERE id_cliente = p_id_cliente;
+END //
+
+DELIMITER ;
+

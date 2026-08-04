@@ -1,89 +1,54 @@
-from flask import Blueprint, render_template, request, jsonify, abort
-import db
-from db import run_query, run_write
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from db import run_query, call_procedure
 
-bp = Blueprint("clientes", __name__, url_prefix="/clientes")
+clientes_bp = Blueprint('clientes', __name__)
 
-
-# --- Páginas (HTML) ---
-# Proximo a cambiar: Crear Views
-@bp.route("/")
+@clientes_bp.route('/')
 def listar():
+    # 100% limpio: Llamada a la vista
     clientes = run_query("SELECT * FROM vw_lista_clientes")
     return render_template('clientes/listar.html', clientes=clientes)
 
+@clientes_bp.route('/crear', methods=['GET', 'POST'])
+def crear():
+    if request.method == 'POST':
+        identificacion = request.form['identificacion']
+        nombre = request.form['nombre']
+        telefono = request.form.get('telefono', '')
+        
+        # Obtenemos quién lo está registrando desde la sesión
+        id_usuario = session.get('id_usuario')
 
-@bp.route("/nuevo")
-def nuevo():
-    usuarios = _usuarios_activos()
-    return render_template("clientes/crear.html", cliente=None, usuarios=usuarios)
+        try:
+            # 100% limpio: Llamada al Procedimiento Almacenado
+            call_procedure('sp_crear_cliente', (identificacion, nombre, telefono, id_usuario))
+            flash("Cliente registrado exitosamente.", "success")
+            return redirect(url_for('clientes.listar'))
+        except Exception as e:
+            flash(f"Error en la base de datos: {str(e)}", "danger")
 
+    return render_template('clientes/crear.html')
 
-@bp.route("/<int:id_cliente>/editar")
-def editar(id_cliente):
-    cliente = db.run_query(
-        "SELECT * FROM Cliente WHERE id_cliente = %s", (id_cliente,), fetch="one"
-    )
-    if cliente is None:
-        abort(404)
+@clientes_bp.route('/<int:id>/editar', methods=['GET', 'POST'])
+def editar(id):
+    if request.method == 'POST':
+        identificacion = request.form['identificacion']
+        nombre = request.form['nombre']
+        telefono = request.form.get('telefono', '')
+        estado = request.form['estado']
 
-    usuarios = _usuarios_activos()
-    return render_template("clientes/editar.html", cliente=cliente, usuarios=usuarios)
+        try:
+            # 100% limpio: Llamada al Procedimiento Almacenado
+            call_procedure('sp_actualizar_cliente', (id, identificacion, nombre, telefono, estado))
+            flash("Datos del cliente actualizados.", "success")
+            return redirect(url_for('clientes.listar'))
+        except Exception as e:
+            flash(f"Error al actualizar: {str(e)}", "danger")
 
+    # Consulta básica por llave primaria (aceptable en Python)
+    cliente = run_query("SELECT * FROM Cliente WHERE id_cliente = %s", (id,))
+    if not cliente:
+        flash("Cliente no encontrado.", "danger")
+        return redirect(url_for('clientes.listar'))
 
-def _usuarios_activos():
-    return db.run_query(
-        "SELECT id_usuario, nombre, rol FROM Usuario WHERE estado = 'Activo' ORDER BY nombre"
-    )
-
-
-# --- API JSON (usada por static/js/clientes.js) ---
-
-@bp.route("/api", methods=["POST"])
-def api_crear():
-    datos = request.get_json(force=True) or {}
-    id_cliente, _ = db.run_write(
-        """
-        INSERT INTO Cliente (nombre, identificacion, telefono, estado, id_usuario)
-        VALUES (%s, %s, %s, %s, %s)
-        """,
-        (
-            datos.get("nombre"),
-            datos.get("identificacion") or None,
-            datos.get("telefono") or None,
-            datos.get("estado", "Activo"),
-            datos.get("id_usuario"),
-        ),
-    )
-    return jsonify(success=True, message="Cliente creado correctamente.", id_cliente=id_cliente)
-
-
-@bp.route("/api/<int:id_cliente>", methods=["PUT"])
-def api_editar(id_cliente):
-    datos = request.get_json(force=True) or {}
-    _, filas = db.run_write(
-        """
-        UPDATE Cliente
-        SET nombre = %s, identificacion = %s, telefono = %s, estado = %s, id_usuario = %s
-        WHERE id_cliente = %s
-        """,
-        (
-            datos.get("nombre"),
-            datos.get("identificacion") or None,
-            datos.get("telefono") or None,
-            datos.get("estado"),
-            datos.get("id_usuario"),
-            id_cliente,
-        ),
-    )
-    if filas == 0:
-        return jsonify(success=False, message="Cliente no encontrado."), 404
-    return jsonify(success=True, message="Cliente actualizado correctamente.")
-
-
-@bp.route("/api/<int:id_cliente>", methods=["DELETE"])
-def api_eliminar(id_cliente):
-    _, filas = db.run_write("DELETE FROM Cliente WHERE id_cliente = %s", (id_cliente,))
-    if filas == 0:
-        return jsonify(success=False, message="Cliente no encontrado."), 404
-    return jsonify(success=True, message="Cliente eliminado correctamente.")
+    return render_template('clientes/editar.html', cliente=cliente[0])

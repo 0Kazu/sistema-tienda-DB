@@ -5,8 +5,7 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    '''
-    # Si el usuario ya está logueado, pal inicio
+    # Si el usuario ya está logueado, lo mandamos al inicio
     if 'id_usuario' in session:
         return redirect(url_for('index'))
 
@@ -14,14 +13,13 @@ def login():
         correo = request.form['correo']
         contrasena = request.form['contrasena']
         
-        # Buscamos al usuario en la BD 
         usuario = run_query(
-            "SELECT id_usuario, nombre, rol FROM Usuario WHERE correo = %s AND contrasena = %s AND estado = 'Activo'", 
+            "SELECT id_usuario, nombre, rol FROM vw_auth_usuarios WHERE correo = %s AND contrasena = %s AND estado = 'Activo'", 
             (correo, contrasena)
         )
         
         if usuario:
-            # Login: Se guardan los datos en la "memoria" del navegador
+            # Si login sale bien xD
             session['id_usuario'] = usuario[0]['id_usuario']
             session['nombre'] = usuario[0]['nombre']
             session['rol'] = usuario[0]['rol']
@@ -32,11 +30,6 @@ def login():
             flash("Correo o contraseña incorrectos, o cuenta inactiva.", "danger")
             
     return render_template('auth/login.html')
-    '''
-    usuario = run_query(
-        "SELECT id_usuario, nombre, rol FROM vw_auth_usuarios WHERE correo = %s AND contrasena = %s AND estado = 'Activo'", 
-        (correo, contrasena)
-    )
 
 @auth_bp.route('/logout')
 def logout():
