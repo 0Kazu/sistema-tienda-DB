@@ -1,15 +1,15 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from db import run_query, call_procedure
 
-clientes_bp = Blueprint('clientes', __name__)
+bp = Blueprint('clientes', __name__)
 
-@clientes_bp.route('/')
+@bp.route('/')
 def listar():
     # 100% limpio: Llamada a la vista
     clientes = run_query("SELECT * FROM vw_lista_clientes")
     return render_template('clientes/listar.html', clientes=clientes)
 
-@clientes_bp.route('/crear', methods=['GET', 'POST'])
+@bp.route('/crear', methods=['GET', 'POST'])
 def crear():
     if request.method == 'POST':
         identificacion = request.form['identificacion']
@@ -29,7 +29,7 @@ def crear():
 
     return render_template('clientes/crear.html')
 
-@clientes_bp.route('/<int:id>/editar', methods=['GET', 'POST'])
+@bp.route('/<int:id>/editar', methods=['GET', 'POST'])
 def editar(id):
     if request.method == 'POST':
         identificacion = request.form['identificacion']
