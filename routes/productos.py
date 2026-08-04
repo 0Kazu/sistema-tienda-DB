@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, abort
-
+from db import run_query, run_write
 import db
 
 bp = Blueprint("productos", __name__, url_prefix="/productos")

@@ -76,11 +76,10 @@ def agregar_detalle(id_pedido):
         
     return redirect(url_for('pedidos.detalles', id_pedido=id_pedido))
 
-# --- NUEVA RUTA PARA ELIMINAR PRODUCTOS DEL CARRITO ---
+# Eliminar productos del pedido
 @pedidos_bp.route('/<int:id_pedido>/eliminar_detalle/<int:id_producto>', methods=['POST'])
 def eliminar_detalle(id_pedido, id_producto):
     try:
-        # Llamamos al procedimiento que elimina la fila y resta el subtotal del total del pedido
         call_procedure('sp_eliminar_detalle', (id_pedido, id_producto))
         flash("Producto eliminado del pedido.", "info")
     except Exception as e:
@@ -95,3 +94,16 @@ def pagar_pedido(id_pedido):
         return jsonify({"status": "success", "message": "¡Pedido pagado exitosamente!"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
+
+# --- NUEVA RUTA PARA CANCELAR Y ELIMINAR EL PEDIDO COMPLETO ---
+@pedidos_bp.route('/<int:id_pedido>/eliminar', methods=['POST'])
+def eliminar_pedido(id_pedido):
+    try:
+        # Python solo llama al procedimiento almacenado, cero SQL crudo
+        call_procedure('sp_eliminar_pedido', (id_pedido,))
+        flash("Pedido cancelado y eliminado correctamente.", "success")
+    except Exception as e:
+        flash(f"No se pudo cancelar el pedido: {str(e)}", "danger")
+        
+    # Como el pedido ya no existe, redirigimos al usuario a la lista general
+    return redirect(url_for('pedidos.listar'))

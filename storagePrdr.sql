@@ -64,7 +64,7 @@ DELIMITER ;
 
 
 -- Otros SP
--- 1. PROCEDIMIENTO PARA CREAR UN PEDIDO
+-- PROCEDIMIENTO PARA CREAR UN PEDIDO
 DELIMITER //
 DROP PROCEDURE IF EXISTS sp_crear_pedido //
 CREATE PROCEDURE sp_crear_pedido(
@@ -82,7 +82,7 @@ END //
 DELIMITER ;
 
 
--- 2. PROCEDIMIENTO PARA AGREGAR PRODUCTOS (Mueve la lógica de Python a SQL)
+-- PROCEDIMIENTO PARA AGREGAR PRODUCTOS (Mueve la lógica de Python a SQL)
 DELIMITER //
 DROP PROCEDURE IF EXISTS sp_agregar_detalle //
 CREATE PROCEDURE sp_agregar_detalle(
@@ -116,7 +116,7 @@ END //
 DELIMITER ;
 
 
--- 3. PROCEDIMIENTO PARA ELIMINAR PRODUCTOS DEL CARRITO (Tu nuevo requerimiento)
+-- PROCEDIMIENTO PARA ELIMINAR PRODUCTOS DEL CARRITO
 DELIMITER //
 DROP PROCEDURE IF EXISTS sp_eliminar_detalle //
 CREATE PROCEDURE sp_eliminar_detalle(
@@ -138,5 +138,19 @@ BEGIN
     -- Restar el valor del total del pedido
     UPDATE Pedido SET total = total - v_subtotal 
     WHERE id_pedido = p_id_pedido;
+END //
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS sp_eliminar_pedido //
+CREATE PROCEDURE sp_eliminar_pedido(
+    IN p_id_pedido INT
+)
+BEGIN
+    -- 1. Borramos primero los productos asociados al pedido (por la Integridad Referencial)
+    DELETE FROM Detalle_Pedido WHERE id_pedido = p_id_pedido;
+    
+    -- 2. Borramos la cabecera del pedido
+    DELETE FROM Pedido WHERE id_pedido = p_id_pedido;
 END //
 DELIMITER ;

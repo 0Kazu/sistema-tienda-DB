@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, abort
-
 import db
+from db import run_query, run_write
 
 bp = Blueprint("clientes", __name__, url_prefix="/clientes")
 
@@ -9,7 +9,6 @@ bp = Blueprint("clientes", __name__, url_prefix="/clientes")
 # Proximo a cambiar: Crear Views
 @bp.route("/")
 def listar():
-    # ¡Mira qué limpio! Python solo llama a la vista y ya.
     clientes = run_query("SELECT * FROM vw_lista_clientes")
     return render_template('clientes/listar.html', clientes=clientes)
 
