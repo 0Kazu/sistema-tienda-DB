@@ -94,7 +94,7 @@ SELECT id_usuario, nombre, correo, contrasena, rol, estado FROM Usuario;
 CREATE OR REPLACE VIEW vw_lista_categorias AS
 SELECT * FROM Categoria ORDER BY id_categoria DESC;
 
--- Reemplazamos la vista de historial para ASEGURARNOS de que incluya el id_usuario
+-- Reemplazar la vista de historial para ASEGURARNOS de que incluya el id_usuario
 CREATE OR REPLACE VIEW vw_historial_pedidos AS
 SELECT p.id_pedido, p.fecha, c.nombre AS cliente, u.nombre AS vendedor, p.total, p.estado, p.id_usuario
 FROM Pedido p
