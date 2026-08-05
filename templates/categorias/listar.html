@@ -40,18 +40,29 @@
                             <th>ID</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
+                            <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for c in categorias %}
                         <tr>
-                            <td>{{ c.id_categoria }}</td>
+                            <td class="text-secondary fw-bold">#{{ c.id_categoria }}</td>
                             <td class="fw-bold">{{ c.nombre }}</td>
                             <td>{{ c.descripcion }}</td>
+                            <td class="text-center">
+                                <a href="{{ url_for('categorias.editar', id_categoria=c.id_categoria) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <form action="{{ url_for('categorias.eliminar', id_categoria=c.id_categoria) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que deseas eliminar la categoría {{ c.nombre }}?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="3" class="text-center">No hay categorías registradas.</td>
+                            <td colspan="4" class="text-center text-muted py-4">No hay categorías registradas.</td>
                         </tr>
                         {% endfor %}
                     </tbody>

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from db import run_query, call_procedure
 
 pedidos_bp = Blueprint('pedidos', __name__, url_prefix="/pedidos")
@@ -19,10 +19,10 @@ def crear():
         id_metodo = request.form.get('id_metodo_pago', 1) 
         
         try:
-            # 100% Limpio: Manejo del parámetro OUT en MariaDB
+            # Todo al procedure
             run_query("CALL sp_crear_pedido(%s, %s, %s, @nuevo_id)", (id_cliente, id_usuario, id_metodo))
             
-            # Recuperamos la variable @nuevo_id que llenó tu SP
+            # Recuperar la salida del procedure
             resultado = run_query("SELECT @nuevo_id AS id")
             nuevo_id = resultado[0]['id']
             
@@ -31,14 +31,12 @@ def crear():
         except Exception as e:
             flash(f"Error al iniciar el pedido: {str(e)}", "danger")
 
-    # --- AQUÍ ESTÁ LA MAGIA QUE FALTABA ---
     clientes = run_query("SELECT * FROM vw_lista_clientes")
     
-    # Consultamos los usuarios activos y los métodos de pago
+    # Consultar los usuarios activos y los métodos de pago
     usuarios = run_query("SELECT id_usuario, nombre FROM Usuario WHERE estado = 'Activo'")
     metodos_pago = run_query("SELECT * FROM Metodo_Pago") 
     
-    # Le pasamos TODAS las variables al HTML
     return render_template('pedidos/crear.html', 
                            clientes=clientes, 
                            usuarios=usuarios, 
@@ -88,3 +86,17 @@ def eliminar_pedido(id_pedido):
         flash(f"No se pudo cancelar el pedido: {str(e)}", "danger")
         
     return redirect(url_for('pedidos.listar'))
+
+@pedidos_bp.route('/<int:id_pedido>/pagar', methods=['POST'])
+def pagar_pedido(id_pedido):
+    try:
+        call_procedure('sp_pagar_pedido', (id_pedido,))
+        
+        return jsonify({"message": "¡Pago procesado exitosamente! El stock ha sido descontado."}), 200
+        
+    except Exception as e:
+        error_msg = str(e)
+        if "45000" in error_msg:
+            error_msg = error_msg.split("45000")[1].strip()
+            
+        return jsonify({"message": error_msg}), 400

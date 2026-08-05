@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from db import run_query, call_procedure
 
-# Declaración cuidadosa con su prefijo para no romper el index
 bp = Blueprint("productos", __name__, url_prefix="/productos")
 
 @bp.route('/')

@@ -3,7 +3,7 @@ from db import run_query, call_procedure
 
 usuarios_bp = Blueprint('usuarios', __name__)
 
-# "Guardia" de seguridad exclusivo para este módulo
+# "Guardia" de seguridad exclusivo para el modulo de usuarios
 @usuarios_bp.before_request
 def solo_admins():
     if session.get('rol') != 'Administrador':
@@ -55,10 +55,9 @@ def editar(id_usuario):
             flash("Datos del usuario actualizados correctamente.", "success")
             return redirect(url_for('usuarios.listar'))
         except Exception as e:
-            # Esto imprimirá el error real en tu terminal negra de Flask
+            # Print para test porque ya no sé dónde está el bendito error
             print(f"============== ERROR EN BD: {str(e)} ==============")
             flash(f"Error al actualizar el usuario: {str(e)}", "danger")
-            # Y le ponemos un return aquí para obligarlo a recargar bien la página y que no baje al GET
             return redirect(url_for('usuarios.editar', id_usuario=id_usuario))
 
     # GET para cargar los datos actuales para mostrarlos en el formulario

@@ -310,3 +310,40 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- Procedimiento para actualizar una categoría existente
+DELIMITER //
+
+-- SP para actualizar una categoría
+DROP PROCEDURE IF EXISTS sp_actualizar_categoria //
+CREATE PROCEDURE sp_actualizar_categoria(
+    IN p_id_categoria INT,
+    IN p_nombre VARCHAR(100),
+    IN p_descripcion TEXT
+)
+BEGIN
+    UPDATE Categoria
+    SET nombre = p_nombre,
+        descripcion = p_descripcion
+    WHERE id_categoria = p_id_categoria;
+END //
+
+-- SP para eliminar una categoría (con validación de seguridad)
+DROP PROCEDURE IF EXISTS sp_eliminar_categoria //
+CREATE PROCEDURE sp_eliminar_categoria(
+    IN p_id_categoria INT
+)
+BEGIN
+    DECLARE v_total_productos INT;
+    
+    -- Revisamos si hay productos amarrados a esta categoría
+    SELECT COUNT(*) INTO v_total_productos FROM Producto WHERE id_categoria = p_id_categoria;
+    
+    IF v_total_productos > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operación rechazada: Hay productos asignados a esta categoría. Reasígnalos primero.';
+    ELSE
+        DELETE FROM Categoria WHERE id_categoria = p_id_categoria;
+    END IF;
+END //
+
+DELIMITER ;
