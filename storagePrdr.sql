@@ -347,3 +347,50 @@ BEGIN
 END //
 
 DELIMITER ;
+
+DELIMITER //
+
+-- SP para crear un nuevo proveedor
+DROP PROCEDURE IF EXISTS sp_crear_proveedor //
+CREATE PROCEDURE sp_crear_proveedor(
+    IN p_nombre VARCHAR(100),
+    IN p_contacto VARCHAR(100)
+)
+BEGIN
+    INSERT INTO Proveedor (nombre, contacto, estado) 
+    VALUES (p_nombre, p_contacto, 'Activo');
+END //
+
+-- SP para actualizar los datos de un proveedor
+DROP PROCEDURE IF EXISTS sp_actualizar_proveedor //
+CREATE PROCEDURE sp_actualizar_proveedor(
+    IN p_id_proveedor INT,
+    IN p_nombre VARCHAR(100),
+    IN p_contacto VARCHAR(100),
+    IN p_estado VARCHAR(20)
+)
+BEGIN
+    UPDATE Proveedor
+    SET nombre = p_nombre,
+        contacto = p_contacto,
+        estado = p_estado
+    WHERE id_proveedor = p_id_proveedor;
+END //
+
+-- SP para eliminación lógica (Baja de proveedor)
+DROP PROCEDURE IF EXISTS sp_eliminar_proveedor //
+CREATE PROCEDURE sp_eliminar_proveedor(
+    IN p_id_proveedor INT
+)
+BEGIN
+    -- Se cambia a Inactivo para no romper los productos que ya están registrados con este proveedor
+    UPDATE Proveedor SET estado = 'Inactivo' WHERE id_proveedor = p_id_proveedor;
+END //
+
+DELIMITER ;
+
+-- Vista segura para listar los proveedores en tu nueva pantalla
+CREATE OR REPLACE VIEW vw_lista_proveedores AS
+SELECT id_proveedor, nombre, contacto, estado
+FROM Proveedor
+ORDER BY id_proveedor DESC;

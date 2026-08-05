@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row mb-4 mt-3">
+        <div class="col-md-8">
+            <h2><i class="fas fa-truck"></i> Gestión de Proveedores</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('productos.listar') }}" class="btn btn-secondary fw-bold">⬅ Volver a Productos</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Formulario para crear -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header bg-dark text-white fw-bold">Nuevo Proveedor</div>
+                <div class="card-body bg-light">
+                    <form action="{{ url_for('proveedores.crear') }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nombre de la Empresa</label>
+                            <input type="text" name="nombre" class="form-control" required placeholder="Ej. Importadora Tech">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Contacto (Teléfono/Email)</label>
+                            <input type="text" name="contacto" class="form-control" placeholder="Ej. 0991234567">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Registrar Proveedor</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de registros -->
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th class="ps-3">ID</th>
+                                <th>Nombre</th>
+                                <th>Contacto</th>
+                                <th>Estado</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in proveedores %}
+                            <tr>
+                                <td class="ps-3 fw-bold text-secondary">#{{ p.id_proveedor }}</td>
+                                <td class="fw-bold">{{ p.nombre }}</td>
+                                <td>{{ p.contacto }}</td>
+                                <td>
+                                    {% if p.estado == 'Activo' %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ url_for('proveedores.editar', id_proveedor=p.id_proveedor) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                    {% if p.estado == 'Activo' %}
+                                    <form action="{{ url_for('proveedores.eliminar', id_proveedor=p.id_proveedor) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Dar de baja a este proveedor?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No hay proveedores registrados.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

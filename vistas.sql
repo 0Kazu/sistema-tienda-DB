@@ -1,7 +1,7 @@
 USE gestor_tienda_db;
 
 -- Vistas
--- VISTA 1: Productos con bajo stock (Para el Bodeguero)
+-- Vista de productos con bajo stock (Para el Bodeguero)
 DROP VIEW IF EXISTS vw_productos_bajo_stock;
 CREATE VIEW vw_productos_bajo_stock AS
 SELECT
@@ -12,7 +12,7 @@ SELECT
 FROM Producto
 WHERE stock_actual <= stock_minimo AND estado = 'Activo';
 
--- VISTA 2: Historial de Pedidos con nombre del cliente
+-- Vista de historial de Pedidos con nombre del cliente
 DROP VIEW IF EXISTS vw_historial_pedidos;
 CREATE VIEW vw_historial_pedidos AS
 SELECT
@@ -24,7 +24,7 @@ SELECT
 FROM Pedido p
 JOIN Cliente c ON p.id_cliente = c.id_cliente;
 
--- VISTA 3: Reporte de productos más vendidos
+-- Vista de reporte de productos más vendidos
 DROP VIEW IF EXISTS vw_top_productos_vendidos;
 CREATE VIEW vw_top_productos_vendidos AS
 SELECT
@@ -38,7 +38,7 @@ WHERE p.estado = 'Pagado'
 GROUP BY pr.id_producto, pr.nombre
 ORDER BY total_unidades_vendidas DESC;
 
--- VISTA 4: Auditoría de ajustes de inventario
+-- Vista de auditoría de ajustes de inventario
 DROP VIEW IF EXISTS vw_auditoria_inventario;
 CREATE VIEW vw_auditoria_inventario AS
 SELECT
@@ -118,3 +118,9 @@ CREATE OR REPLACE VIEW vw_lista_usuarios AS
 SELECT id_usuario, nombre, correo, rol, estado
 FROM Usuario
 ORDER BY id_usuario DESC;
+
+-- Vista segura para listar los proveedores en la sección productos
+CREATE OR REPLACE VIEW vw_lista_proveedores AS
+SELECT id_proveedor, nombre, contacto, estado
+FROM Proveedor
+ORDER BY id_proveedor DESC;
