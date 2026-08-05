@@ -55,3 +55,14 @@ def editar(id_cliente):
     #return render_template('clientes/editar.html', cliente=cliente[0])
     usuarios = run_query("SELECT id_usuario, nombre, rol FROM Usuario WHERE estado = 'Activo'")
     return render_template('clientes/editar.html', cliente=cliente[0], usuarios=usuarios)
+
+
+@bp.route('/<int:id_cliente>/eliminar', methods=['POST'])
+def eliminar(id_cliente):
+    try:
+        run_query("UPDATE Cliente SET estado = 'Inactivo' WHERE id_cliente = %s", (id_cliente,))
+        flash("Cliente dado de baja exitosamente.", "success")
+    except Exception as e:
+        flash(f"Error al eliminar: {str(e)}", "danger")
+
+    return redirect(url_for('clientes.listar'))

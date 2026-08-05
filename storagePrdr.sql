@@ -1,6 +1,6 @@
 USE gestor_tienda_db;
 
--- Procedimiento Pagar Pedido
+-- Procedimiento Pagar Pedido -- Check
 DELIMITER //
 DROP PROCEDURE IF EXISTS sp_pagar_pedido //
 
@@ -64,7 +64,8 @@ DELIMITER ;
 
 
 -- Otros SP
--- PROCEDIMIENTO PARA CREAR UN PEDIDO
+-- PROCEDIMIENTO PARA CREAR UN PEDIDO -- Check
+/*
 DELIMITER //
 DROP PROCEDURE IF EXISTS sp_crear_pedido //
 CREATE PROCEDURE sp_crear_pedido(
@@ -80,9 +81,10 @@ BEGIN
     SET p_id_pedido = LAST_INSERT_ID();
 END //
 DELIMITER ;
+*/
 
 
--- PROCEDIMIENTO PARA AGREGAR PRODUCTOS (Mueve la lógica de Python a SQL)
+-- PROCEDIMIENTO PARA AGREGAR PRODUCTOS -- Check
 DELIMITER //
 DROP PROCEDURE IF EXISTS sp_agregar_detalle //
 CREATE PROCEDURE sp_agregar_detalle(
@@ -116,7 +118,7 @@ END //
 DELIMITER ;
 
 
--- PROCEDIMIENTO PARA ELIMINAR PRODUCTOS DEL CARRITO
+-- PROCEDIMIENTO PARA ELIMINAR PRODUCTOS DEL CARRITO -- Check
 DELIMITER //
 DROP PROCEDURE IF EXISTS sp_eliminar_detalle //
 CREATE PROCEDURE sp_eliminar_detalle(
@@ -147,17 +149,17 @@ CREATE PROCEDURE sp_eliminar_pedido(
     IN p_id_pedido INT
 )
 BEGIN
-    -- 1. Borramos primero los productos asociados al pedido (por la Integridad Referencial)
+    -- Borrar los productos asociados al pedido (por la Integridad Referencial)
     DELETE FROM Detalle_Pedido WHERE id_pedido = p_id_pedido;
     
-    -- 2. Borramos la cabecera del pedido
+    -- Borrar la cabecera del pedido
     DELETE FROM Pedido WHERE id_pedido = p_id_pedido;
 END //
 DELIMITER ;
 
 DELIMITER //
 
--- SP para listar pedidos según el ROL (Tu regla de negocio)
+-- SP para listar pedidos según el ROL -- Check
 DROP PROCEDURE IF EXISTS sp_listar_pedidos //
 CREATE PROCEDURE sp_listar_pedidos(IN p_rol VARCHAR(50), IN p_id_usuario INT)
 BEGIN
@@ -170,14 +172,14 @@ BEGIN
     END IF;
 END //
 
--- SP para crear Categorías
+-- SP para crear Categorías -- Check
 DROP PROCEDURE IF EXISTS sp_crear_categoria //
 CREATE PROCEDURE sp_crear_categoria(IN p_nombre VARCHAR(100), IN p_descripcion TEXT)
 BEGIN
     INSERT INTO Categoria (nombre, descripcion) VALUES (p_nombre, p_descripcion);
 END //
 
--- SP para crear Usuarios
+-- SP para crear Usuarios  -- Check
 DROP PROCEDURE IF EXISTS sp_crear_usuario //
 CREATE PROCEDURE sp_crear_usuario(
     IN p_nombre VARCHAR(100), 
@@ -194,7 +196,7 @@ DELIMITER ;
 
 DELIMITER //
 
--- SP para crear un nuevo cliente
+-- SP para crear un nuevo cliente -- Check
 DROP PROCEDURE IF EXISTS sp_crear_cliente //
 CREATE PROCEDURE sp_crear_cliente(
     IN p_identificacion VARCHAR(20),
@@ -207,7 +209,7 @@ BEGIN
     VALUES (p_identificacion, p_nombre, p_telefono, p_id_usuario, 'Activo');
 END //
 
--- SP para actualizar un cliente existente
+-- SP para actualizar un cliente existente -- Check
 DROP PROCEDURE IF EXISTS sp_actualizar_cliente //
 CREATE PROCEDURE sp_actualizar_cliente(
     IN p_id_cliente INT,
@@ -229,7 +231,8 @@ DELIMITER ;
 
 DELIMITER //
 
--- SP para crear un nuevo producto
+-- SP para crear un nuevo producto -- Check
+/*
 DROP PROCEDURE IF EXISTS sp_crear_producto //
 CREATE PROCEDURE sp_crear_producto(
     IN p_nombre VARCHAR(150),
@@ -238,7 +241,8 @@ CREATE PROCEDURE sp_crear_producto(
     IN p_precio_costo DECIMAL(10,2),
     IN p_precio_venta DECIMAL(10,2),
     IN p_stock_actual INT,
-    IN p_stock_minimo INT
+    IN p_stock_minimo INT,
+    IN p_id_usuario INT -- Testing
 )
 BEGIN
     INSERT INTO Producto (
@@ -251,8 +255,37 @@ BEGIN
         p_stock_actual, p_stock_minimo, 'Activo'
     );
 END //
+*/
 
--- SP para actualizar un producto
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS sp_crear_producto //
+CREATE PROCEDURE sp_crear_producto(
+    IN p_nombre VARCHAR(150),
+    IN p_id_categoria INT,
+    IN p_id_proveedor INT,
+    IN p_precio_costo DECIMAL(10,2),
+    IN p_precio_venta DECIMAL(10,2),
+    IN p_stock_actual INT,
+    IN p_stock_minimo INT,
+    IN p_id_usuario INT
+)
+BEGIN
+    INSERT INTO Producto (
+        nombre, id_categoria, id_proveedor, 
+        precio_costo, precio_venta, 
+        stock_actual, stock_minimo, estado, id_usuario
+    ) VALUES (
+        p_nombre, p_id_categoria, p_id_proveedor, 
+        p_precio_costo, p_precio_venta, 
+        p_stock_actual, p_stock_minimo, 'Activo', p_id_usuario
+    );
+END //
+
+DELIMITER ;
+
+DELIMITER //
+-- SP para actualizar un producto -- Check
 DROP PROCEDURE IF EXISTS sp_actualizar_producto //
 CREATE PROCEDURE sp_actualizar_producto(
     IN p_id_producto INT,
@@ -278,7 +311,7 @@ BEGIN
     WHERE id_producto = p_id_producto;
 END //
 
--- SP para eliminación lógica (cambiar estado en lugar de borrar para no dañar facturas viejas)
+-- SP para eliminación lógica de producto
 DROP PROCEDURE IF EXISTS sp_eliminar_producto //
 CREATE PROCEDURE sp_eliminar_producto(
     IN p_id_producto INT
@@ -289,7 +322,7 @@ END //
 
 DELIMITER ;
 
--- SP para actualizar datos de usuario
+-- SP para actualizar datos de usuario -- Check
 DELIMITER //
 
 DROP PROCEDURE IF EXISTS sp_actualizar_usuario //
@@ -311,10 +344,8 @@ END //
 
 DELIMITER ;
 
--- Procedimiento para actualizar una categoría existente
+-- Procedimiento para actualizar una categoría existente -- Check
 DELIMITER //
-
--- SP para actualizar una categoría
 DROP PROCEDURE IF EXISTS sp_actualizar_categoria //
 CREATE PROCEDURE sp_actualizar_categoria(
     IN p_id_categoria INT,
@@ -328,7 +359,7 @@ BEGIN
     WHERE id_categoria = p_id_categoria;
 END //
 
--- SP para eliminar una categoría (con validación de seguridad)
+-- SP para eliminar una categoría
 DROP PROCEDURE IF EXISTS sp_eliminar_categoria //
 CREATE PROCEDURE sp_eliminar_categoria(
     IN p_id_categoria INT

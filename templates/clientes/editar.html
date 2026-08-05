@@ -12,7 +12,7 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form id="form-cliente" data-modo="editar" data-id-cliente="{{ cliente.id_cliente }}">
+            <form action="{{ url_for('clientes.editar', id_cliente=cliente.id_cliente) }}" method="POST">
                 {% include "clientes/_form_campos.html" %}
                 <div class="mt-4 d-flex gap-2">
                     <button type="submit" class="btn btn-primary">

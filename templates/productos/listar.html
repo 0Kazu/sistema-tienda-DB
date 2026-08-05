@@ -66,10 +66,11 @@
                                class="btn btn-sm btn-outline-primary" title="Editar">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar-producto"
-                                    data-id="{{ p.id_producto }}" data-nombre="{{ p.nombre }}" title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                            <form action="{{ url_for('productos.eliminar', id_producto=p.id_producto) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que deseas dar de baja el producto {{ p.nombre }}?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}
@@ -85,3 +86,4 @@
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/productos.js') }}"></script>
 {% endblock %}
+
