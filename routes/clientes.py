@@ -20,7 +20,7 @@ def crear():
         id_usuario = session.get('id_usuario')
 
         try:
-            # Llamada al Procedimiento Almacenado
+            # Llamada al SP
             call_procedure('sp_crear_cliente', (identificacion, nombre, telefono, id_usuario))
             flash("Cliente registrado exitosamente.", "success")
             return redirect(url_for('clientes.listar'))
@@ -38,14 +38,13 @@ def editar(id_cliente):
         estado = request.form['estado']
 
         try:
-            # Pasar id_cliente al procedimiento almacenado
+            # Pasar id_cliente al SP
             call_procedure('sp_actualizar_cliente', (id_cliente, identificacion, nombre, telefono, estado))
             flash("Datos del cliente actualizados.", "success")
             return redirect(url_for('clientes.listar'))
         except Exception as e:
             flash(f"Error al actualizar: {str(e)}", "danger")
 
-    # Usamos id_cliente en la consulta de búsqueda
     cliente = run_query("SELECT * FROM Cliente WHERE id_cliente = %s", (id_cliente,))
     if not cliente:
         flash("Cliente no encontrado.", "danger")

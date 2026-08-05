@@ -288,3 +288,25 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- SP para actualizar datos de usuario
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS sp_actualizar_usuario //
+CREATE PROCEDURE sp_actualizar_usuario(
+    IN p_id_usuario INT,
+    IN p_nombre VARCHAR(100),
+    IN p_correo VARCHAR(100),
+    IN p_rol VARCHAR(50),
+    IN p_estado ENUM('Activo', 'Inactivo')
+)
+BEGIN
+    UPDATE Usuario
+    SET nombre = p_nombre,
+        correo = p_correo,
+        rol = p_rol,
+        estado = p_estado
+    WHERE id_usuario = p_id_usuario;
+END //
+
+DELIMITER ;

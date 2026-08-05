@@ -33,6 +33,6 @@ def login():
 
 @auth_bp.route('/logout')
 def logout():
-    session.clear() # Borramos la "memoria"
+    session.clear()
     flash("Has cerrado sesión exitosamente.", "info")
     return redirect(url_for('auth.login'))

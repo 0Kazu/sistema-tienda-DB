@@ -51,7 +51,7 @@ FROM Ajuste_Inventario a
 JOIN Producto p ON a.id_producto = p.id_producto
 ORDER BY a.fecha DESC;
 
--- Otras vistas
+-- Otras vistas igual de relevantes
 CREATE OR REPLACE VIEW vw_clientes_activos AS 
 SELECT id_cliente, nombre FROM Cliente WHERE estado = 'Activo';
 
@@ -101,23 +101,20 @@ FROM Pedido p
 JOIN Cliente c ON p.id_cliente = c.id_cliente
 JOIN Usuario u ON p.id_usuario = u.id_usuario;
 
-USE gestor_tienda_db;
+-- Vista para ver el detalle del pedido
+CREATE OR REPLACE VIEW vw_detalles_pedido AS
+SELECT 
+    dp.id_pedido, 
+    dp.id_producto, -- Importante para que tu botón de eliminar sepa qué producto borrar
+    p.nombre AS nombre_producto, 
+    dp.cantidad, 
+    dp.precio_unitario, 
+    (dp.cantidad * dp.precio_unitario) AS subtotal -- Cálculo al vuelo
+FROM Detalle_Pedido dp
+JOIN Producto p ON dp.id_producto = p.id_producto;
 
--- 2. Crear Proveedor y Categoría (Obligatorios para Producto)
-INSERT INTO Proveedor (nombre, contacto) 
-VALUES ('Importadora Tech', '0991234567');
-
-INSERT INTO Categoria (nombre, descripcion) 
-VALUES ('Periféricos', 'Teclados, mouses y audífonos');
-
--- 3. Crear Productos
-INSERT INTO Producto (nombre, precio_costo, precio_venta, stock_actual, stock_minimo, id_usuario, id_proveedor, id_categoria)
-VALUES 
--- Producto 1: Todo normal (Stock 30, Mínimo 10)
-('Mouse Inalámbrico', 10.00, 20.00, 30, 10, 1, 1, 1),
-
--- Producto 2: ¡STOCK BAJO! (Stock 2, Mínimo 5). Este debería aparecer en tu web.
-('Teclado Mecánico', 35.00, 60.00, 2, 5, 1, 1, 1);
-
-
-INSERT INTO Metodo_Pago (nombre, descripcion) VALUES ('Efectivo', 'Pago en caja'), ('Transferencia', 'Pichincha/Guayaquil');
+-- Vista para ver los Usuarios creados en el sistema (No clientes)
+CREATE OR REPLACE VIEW vw_lista_usuarios AS
+SELECT id_usuario, nombre, correo, rol, estado
+FROM Usuario
+ORDER BY id_usuario DESC;

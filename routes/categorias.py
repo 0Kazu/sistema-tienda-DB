@@ -3,7 +3,7 @@ from db import run_query, run_write
 
 categorias_bp = Blueprint('categorias', __name__, url_prefix="/categorias")
 
-# Guardia de seguridad: Solo Admin y Bodeguero tocan categorías
+# Solo Admin y Bodeguero tocan categorías
 @categorias_bp.before_request
 def check_rol():
     if session.get('rol') not in ['Administrador', 'Bodeguero']:
@@ -21,7 +21,8 @@ def crear():
     descripcion = request.form.get('descripcion', '')
     
     try:
-        # Reemplazo del INSERT por el SP
+        # LLAMAR a solo procedures
+        # No inyectar código SQL directo desde python!!!!
         from db import call_procedure
         call_procedure('sp_crear_categoria', (nombre, descripcion))
         flash("Categoría agregada exitosamente.", "success")
