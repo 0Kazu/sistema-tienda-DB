@@ -51,11 +51,9 @@ def crear():
         stock_actual = request.form.get('stock_actual')
         stock_minimo = request.form.get('stock_minimo')
         
-        # Rescatamos el usuario (el parámetro #8)
         id_usuario = request.form.get('id_usuario') or session.get('id_usuario')
         
         try:
-            # Enviamos los 8 parámetros exactos que espera el SP
             call_procedure('sp_crear_producto', (
                 nombre, id_categoria, id_proveedor, 
                 precio_costo, precio_venta, stock_actual, stock_minimo, id_usuario
@@ -63,7 +61,7 @@ def crear():
             flash("Producto agregado exitosamente.", "success")
             return redirect(url_for('productos.listar'))
         except Exception as e:
-            print(f"❌ ERROR EN BASE DE DATOS: {str(e)}")
+            print(f"ERROR EN BASE DE DATOS XD: {str(e)}")
             flash(f"Error al crear el producto: {str(e)}", "danger")
 
     categorias = run_query("SELECT * FROM vw_categorias_activas")
@@ -94,7 +92,7 @@ def editar(id_producto):
         except Exception as e:
             flash(f"Error al actualizar el producto: {str(e)}", "danger")
             
-    # Búsqueda individual limpia
+    # Búsqueda individual "limpia"
     producto = run_query("SELECT * FROM Producto WHERE id_producto = %s", (id_producto,))
     if not producto:
         flash("Producto no encontrado.", "danger")
