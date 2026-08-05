@@ -1,7 +1,7 @@
 USE gestor_tienda_db;
 
 -- Vistas
--- Vista de productos con bajo stock (Para el Bodeguero)
+-- Vista de productos con bajo stock (Para el Bodeguero y ADMIN)
 DROP VIEW IF EXISTS vw_productos_bajo_stock;
 CREATE VIEW vw_productos_bajo_stock AS
 SELECT

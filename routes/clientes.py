@@ -27,7 +27,9 @@ def crear():
         except Exception as e:
             flash(f"Error en la base de datos: {str(e)}", "danger")
 
-    return render_template('clientes/crear.html')
+    #return render_template('clientes/crear.html')
+    usuarios = run_query("SELECT id_usuario, nombre, rol FROM Usuario WHERE estado = 'Activo'")
+    return render_template('clientes/crear.html', usuarios=usuarios)
 
 @bp.route('/<int:id_cliente>/editar', methods=['GET', 'POST'])
 def editar(id_cliente):
@@ -50,4 +52,6 @@ def editar(id_cliente):
         flash("Cliente no encontrado.", "danger")
         return redirect(url_for('clientes.listar'))
 
-    return render_template('clientes/editar.html', cliente=cliente[0])
+    #return render_template('clientes/editar.html', cliente=cliente[0])
+    usuarios = run_query("SELECT id_usuario, nombre, rol FROM Usuario WHERE estado = 'Activo'")
+    return render_template('clientes/editar.html', cliente=cliente[0], usuarios=usuarios)

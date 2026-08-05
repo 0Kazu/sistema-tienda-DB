@@ -1,6 +1,6 @@
 {# Se incluye desde clientes/crear.html (cliente=None) y clientes/editar.html
    (cliente=dict con la fila actual). El <select> de usuario se llena
-   siempre desde la BD, nunca hardcodeado, porque es una FK. #}
+   siempre desde la BD, nunca hardcodeado XD, porque es una FK. #}
 
 <div class="row g-3">
     <div class="col-md-6">
@@ -29,7 +29,6 @@
             <option value="Activo" {{ "selected" if not cliente or cliente.estado == "Activo" }}>Activo</option>
             <option value="Inactivo" {{ "selected" if cliente and cliente.estado == "Inactivo" }}>Inactivo</option>
         </select>
-        <div class="form-text">Si el cliente ya tiene pedidos, usa "Inactivo" en vez de eliminarlo (RB07).</div>
     </div>
 
     <div class="col-md-8">

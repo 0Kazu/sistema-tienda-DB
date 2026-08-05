@@ -27,10 +27,14 @@ Luego, colocan sus credenciales e inician el servidor local de mySQL/MariaDB.
 
 ## 4. Cargar el esquema
 
-Tienen que ejecutar el script el cliente de mySQL/MariaDB (o por consola):
+Tienen que ejecutar los scripts en el cliente de mySQL/MariaDB (o por consola):
 
 ```bash
-mysql -u root -p < AVANCE1_PROYECTO_SBD.sql
+mysql -u root -p < createTables.sql
+mysql -u root -p < vistas.sql
+mysql -u root -p < triggers.sql
+mysql -u root -p < storagePrdr.sql
+
 ```
 
 ## 5. Ejecutar la aplicación

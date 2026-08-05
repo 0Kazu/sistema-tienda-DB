@@ -33,7 +33,7 @@ function initFormularioCliente() {
 
         submitBtn.classList.remove("is-loading");
 
-        // apiRequest ya mostró la alerta de error si algo falló.
+        // apiRequest ya mostró la alerta de error si algo falló
         if (data) {
             window.location.href = "/clientes/";
         }

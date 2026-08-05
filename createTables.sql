@@ -1,14 +1,11 @@
 Create Database IF NOT EXISTS gestor_tienda_db;
 USE gestor_tienda_db;
 
--- Inicio SQL
-Create Database IF NOT EXISTS gestor_tienda_db;
-USE gestor_tienda_db; 
 -- TABLA: USUARIO
 DROP TABLE IF EXISTS Usuario;
 CREATE TABLE IF NOT EXISTS Usuario (
     id_usuario INT PRIMARY KEY AUTO_INCREMENT,
-    nombre_completo VARCHAR(100) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
     correo VARCHAR(100) UNIQUE NOT NULL,
     contrasena VARCHAR(255) NOT NULL,
     rol ENUM('Administrador', 'Vendedor', 'Bodeguero') NOT NULL,
@@ -20,7 +17,7 @@ CREATE TABLE IF NOT EXISTS Usuario (
 DROP TABLE IF EXISTS Cliente;
 CREATE TABLE IF NOT EXISTS Cliente (
     id_cliente INT PRIMARY KEY AUTO_INCREMENT,
-    nombre_completo VARCHAR(100) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
     identificacion VARCHAR(50),
     telefono VARCHAR(20),
     estado ENUM('Activo', 'Inactivo') DEFAULT 'Activo',
@@ -130,3 +127,12 @@ CREATE TABLE IF NOT EXISTS Ajuste_Inventario (
     FOREIGN KEY (id_producto) REFERENCES Producto(id_producto),
     CHECK (cantidad > 0)
 );
+
+-- Índices
+-- Índice vital para el "Dashboard"; acelera el filtro de pedidos pendientes vs pagados
+CREATE INDEX idx_pedido_estado ON Pedido(estado);
+
+-- Índice para optimizar el reporte de ventas
+CREATE INDEX idx_pedido_fecha ON Pedido(fecha);
+
+
