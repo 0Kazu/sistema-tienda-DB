@@ -3,6 +3,7 @@ from flask import Flask, render_template, jsonify
 from flask import request, session, redirect, url_for, flash
 
 import db
+from db import run_query
 from config import Config
 from routes.productos import bp as productos_bp
 from routes.clientes import bp as clientes_bp
@@ -51,7 +52,9 @@ def create_app():
     @app.route("/")
     def index():
         productos_bajo_stock = db.run_query("SELECT * FROM vw_productos_bajo_stock")
-        return render_template("index.html", productos=productos_bajo_stock)
+        top_ventas = run_query("SELECT * FROM vw_top_productos_vendidos LIMIT 10")
+        
+        return render_template('index.html', productos=productos_bajo_stock, top_ventas=top_ventas)
 
     @app.route("/api/productos/bajo-stock")
     def api_productos_bajo_stock():

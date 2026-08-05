@@ -389,8 +389,4 @@ END //
 
 DELIMITER ;
 
--- Vista segura para listar los proveedores en tu nueva pantalla
-CREATE OR REPLACE VIEW vw_lista_proveedores AS
-SELECT id_proveedor, nombre, contacto, estado
-FROM Proveedor
-ORDER BY id_proveedor DESC;
+

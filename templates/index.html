@@ -10,6 +10,7 @@
     </div>
 
     <div class="card shadow-sm">
+
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <span><i class="bi bi-exclamation-triangle text-warning"></i> Productos con bajo stock</span>
             <span class="badge bg-secondary">vw_productos_bajo_stock</span>
@@ -41,6 +42,47 @@
                     No hay productos por debajo de su stock mínimo (o la tabla Producto está vacía).
                 </p>
             {% endif %}
+        </div>
+    </div>
+
+    <br><br>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-clipboard-data"></i> Productos más vendidos</span>
+            <span class="badge bg-secondary">vw_top_productos_vendidos</span>
+        </div>
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">ID</th>
+                            <th>Producto</th>
+                            <th class="text-center">Unidades Vendidas</th>
+                            <th class="text-end pe-3">Ingresos Totales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for p in top_ventas %}
+                        <tr>
+                            <td class="ps-3 fw-bold text-secondary">{{ loop.index }}</td>
+                            <td class="fw-bold">{{ p.producto }}</td>
+                            <td class="text-center">{{ p.total_unidades_vendidas }}</td>
+                            <td class="text-end pe-3 text-success fw-bold">
+                                ${{ "%.2f"|format(p.ingresos_totales) }}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                Aún no hay ventas pagadas registradas en el sistema.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
